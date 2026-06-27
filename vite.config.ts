@@ -8,4 +8,8 @@ export default defineConfig({
     port: 3001,
     host: true,
   },
+  build: {
+    // Increases the warning threshold to 1000 KB (1 MB)
+    chunkSizeWarningLimit: 1000, 
+  }
 })
