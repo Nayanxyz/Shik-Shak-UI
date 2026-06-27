@@ -54,3 +54,60 @@ interface GameState {
   resetGame: () => void
 }
 
+export const useGameStore = create<GameState>((set) => ({
+  isConnected: false,
+  roomCode: null,
+  mode: null,
+  subject: null,
+  difficulty: null,
+  status: 'WAITING',
+  players: [],
+  isHost: false,
+  currentQuestion: 0,
+  totalQuestions: 5,
+  questions: [],
+  timeRemaining: 60,
+  selectedOption: null,
+  hasAnswered: false,
+  questionResults: null,
+  leaderboard: null,
+  finalRankings: null,
+
+  setConnected: (connected) => set({ isConnected: connected }),
+
+  setRoom: (room) => {
+    if (!room) {
+      set({
+        roomCode: null,
+        mode: null,
+        subject: null,
+        difficulty: null,
+        status: 'WAITING',
+        isHost: false,
+        players: [],
+      });
+      return;
+    }
+    set({
+      roomCode: room.room_code,
+      mode: room.mode,
+      subject: room.subject,
+      difficulty: room.difficulty,
+      status: room.status,
+      isHost: room.is_host,
+      players: room.players || [],
+    });
+  },
+
+  setPlayers: (players) => set({ players }),
+
+  setQuestion: (q, total) => set(() => ({
+    currentQuestion: q.question_number,
+    totalQuestions: total,
+    questions: [q],
+    timeRemaining: q.time_limit || 60,
+    selectedOption: null,
+    hasAnswered: false,
+    questionResults: null,
+  })),
+
