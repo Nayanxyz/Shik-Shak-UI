@@ -145,6 +145,7 @@ export default function BattleLobby() {
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [disconnected, setDisconnected] = useState(false);
   const [questionsReady, setQuestionsReady] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
 
   const listenersAttached = useRef(false);
 
@@ -176,6 +177,13 @@ export default function BattleLobby() {
 
     socket.on('player_left', (data: any) => {
       store.setPlayers(data.players);
+      // Replaces alert()
+      setPopupMessage("A player has left the room.");
+    });
+
+    socket.on('player_left_notification', (data: any) => {
+      // Replaces alert()
+      setPopupMessage(data.message);
     });
 
     socket.on('kicked', () => {
@@ -357,6 +365,33 @@ export default function BattleLobby() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {popupMessage && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full space-y-4 text-center shadow-2xl">
+              
+              <div className="flex justify-center mb-2">
+                <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6 text-yellow-400" />
+                </div>
+              </div>
+              
+              <h3 className="text-xl font-bold text-white">Notice</h3>
+              <p className="text-slate-400">{popupMessage}</p>
+              
+              <button 
+                onClick={() => setPopupMessage('')} 
+                className="w-full py-3 mt-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all font-medium text-white"
+              >
+                Got it
+              </button>
+              
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
 
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold mb-2">Battle Arena</h1>
