@@ -138,6 +138,7 @@ export default function PracticePage() {
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState('');
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   
   const timerActiveRef = useRef(false);
 
