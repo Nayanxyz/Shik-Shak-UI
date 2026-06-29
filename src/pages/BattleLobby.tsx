@@ -211,9 +211,9 @@ export default function BattleLobby() {
     });
 
     socket.on('room_forfeited', (data: any) => {
-      alert(data.message);
+      setPopupMessage(data.message); // Use the custom modal instead
       disconnectSocket();
-      store.setRoom(null); // Use store.setRoom(null) if setRoomCode throws an error
+      store.setRoom(null); 
       store.resetGame();
       navigate('/', { replace: true });
     });
