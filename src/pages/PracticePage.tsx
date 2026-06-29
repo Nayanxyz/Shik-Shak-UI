@@ -221,6 +221,25 @@ export default function PracticePage() {
     }
   };
 
+  const handleLeavePractice = async () => {
+    if (!session?.session_id) {
+      navigate('/');
+      return;
+    }
+
+    try {
+      await apiFetch('/api/v1/practice/finish', {
+        method: 'POST',
+        body: JSON.stringify({ session_id: session.session_id }),
+      });
+    } catch (e) {
+      console.error("Failed to finish practice session cleanly:", e);
+    } finally {
+      setShowExitConfirm(false);
+      navigate('/');
+    }
+  };
+
   const nextQuestion = () => {
     if (currentQ + 1 >= session.total_questions) {
       navigate('/practice/results', { state: { sessionId: session.session_id } });
