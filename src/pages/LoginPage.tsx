@@ -20,6 +20,14 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      GoogleSignIn.initialize({
+        clientId: '800724753502-v0e5e93c0erflqhinbau82lv5rtv8o53.apps.googleusercontent.com', 
+      });
+    }
+  }, []);
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -55,8 +63,31 @@ export default function LoginPage() {
   };
 
   const handleGoogle = async () => {
-    const { error } = await signInWithGoogle();
-    if (error) setError(error.message);
+    setError('');
+    
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const result = await GoogleSignIn.signIn();
+        if (!result.idToken) throw new Error("No token returned from Google");
+
+        const { error } = await supabase.auth.signInWithIdToken({
+          provider: 'google',
+          token: result.idToken,
+        });
+
+        if (error) throw error;
+        
+        await loadUser();
+        navigate('/');
+      } catch (err: any) {
+        console.error("Native Auth Error:", err);
+        setError(err.message || "Native Google Login failed");
+      }
+    } else {
+      // Standard Web Flow
+      const { error } = await signInWithGoogle();
+      if (error) setError(error.message);
+    }
   };
 
   return (
