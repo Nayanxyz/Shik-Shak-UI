@@ -5,6 +5,7 @@ import { Brain, Clock, CheckCircle, XCircle, ArrowRight, BookOpen, Dices, Zap } 
 import { cn } from '../lib/utils'
 import MathHtml from '../components/MathHtml'
 import { apiFetch } from '../lib/api'
+import { LogOut, AlertCircle } from 'lucide-react'
 
 const SUBJECTS = ['MATH', 'PHYSICS', 'CHEMISTRY', 'BIOLOGY'] as const
 const DIFFICULTIES = ['LOW', 'HIGH'] as const
