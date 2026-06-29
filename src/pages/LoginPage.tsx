@@ -5,6 +5,9 @@ import { Mail, Lock, User, ArrowRight, Chrome, Eye, EyeOff } from 'lucide-react'
 import { cn } from '../lib/utils';
 import { signUpWithEmail, signInWithEmail, signInWithGoogle } from '../lib/supabase';
 import { useAuthStore } from '../store/authStore';
+import { Capacitor } from '@capacitor/core';
+import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in';
+import { supabase } from '../lib/supabase';
 
 export default function LoginPage() {
   const navigate = useNavigate();
