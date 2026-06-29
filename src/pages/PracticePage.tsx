@@ -327,7 +327,11 @@ export default function PracticePage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm text-slate-400"><Brain className="w-4 h-4" />Question {currentQ + 1} of {session.total_questions}</div>
               <div className={cn("flex items-center gap-2 px-4 py-2 rounded-full text-sm font-mono", timeRemaining <= 10 ? "bg-red-500/20 text-red-300" : "bg-slate-800")}><Clock className="w-4 h-4" />{timeRemaining}s</div>
+                <button onClick={() => setShowExitConfirm(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 border border-slate-700 transition-all text-sm shrink-0">
+                    <LogOut className="w-4 h-4" /> Leave
+                </button>
             </div>
+            
             <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
               <motion.div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500" initial={{ width: 0 }} animate={{ width: `${((currentQ + 1) / session.total_questions) * 100}%` }} />
             </div>
