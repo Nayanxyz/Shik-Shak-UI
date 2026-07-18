@@ -218,6 +218,13 @@ export default function BattleLobby() {
       navigate('/', { replace: true });
     });
 
+    socket.on('player_kicked', (data: any) => {
+      store.setPlayers(data.players);
+      // Optional: Show a quick popup to the host that it worked
+      setPopupMessage("Player was removed from the room.");
+    });
+
+
     socket.on('connect', () => setDisconnected(false));
     socket.on('disconnect', () => setDisconnected(true));
 
@@ -238,6 +245,7 @@ export default function BattleLobby() {
       socket.off('connect');
       socket.off('disconnect');
       socket.off('room_forfeited');
+      socket.off('player_kicked');
       listenersAttached.current = false;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
