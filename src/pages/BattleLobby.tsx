@@ -134,6 +134,9 @@ export default function BattleLobby() {
   const [mode, setMode] = useState<'menu' | 'create' | 'join'>('menu');
   const [subject, setSubject] = useState('MATH');
   const [difficulty, setDifficulty] = useState('LOW');
+  const [gameType, setGameType] = useState<'AI' | 'PYQ' | 'MOCK'>('AI');
+  const [selectedYears, setSelectedYears] = useState<number[]>([]);
+  const AVAILABLE_YEARS = [2023, 2022, 2021, 2020, 2019];
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [maxPlayers, setMaxPlayers] = useState(4);
   const [timePerQuestion, setTimePerQuestion] = useState(60);
@@ -155,7 +158,6 @@ export default function BattleLobby() {
     listenersAttached.current = true;
 
     socket.on('room_created', (data: any) => {
-      console.log('RECEIVED room_created:', data);
       store.setRoom(data);
       store.setConnected(true);
       setIsConnecting(false);
@@ -177,12 +179,10 @@ export default function BattleLobby() {
 
     socket.on('player_left', (data: any) => {
       store.setPlayers(data.players);
-      // Replaces alert()
       setPopupMessage("A player has left the room.");
     });
 
     socket.on('player_left_notification', (data: any) => {
-      // Replaces alert()
       setPopupMessage(data.message);
     });
 
@@ -211,7 +211,7 @@ export default function BattleLobby() {
     });
 
     socket.on('room_forfeited', (data: any) => {
-      setPopupMessage(data.message); // Use the custom modal instead
+      setPopupMessage(data.message); 
       disconnectSocket();
       store.setRoom(null); 
       store.resetGame();
@@ -220,10 +220,8 @@ export default function BattleLobby() {
 
     socket.on('player_kicked', (data: any) => {
       store.setPlayers(data.players);
-      // Optional: Show a quick popup to the host that it worked
       setPopupMessage("Player was removed from the room.");
     });
-
 
     socket.on('connect', () => setDisconnected(false));
     socket.on('disconnect', () => setDisconnected(true));
@@ -251,13 +249,6 @@ export default function BattleLobby() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // useEffect(() => {
-  //   const socket = getSocket();
-  //   if (!socket.connected) {
-  //     socket.connect();
-  //   }
-  // }, []);
-
   useEffect(() => {
     if (!store.roomCode) {
       setMode('menu');
@@ -282,19 +273,18 @@ export default function BattleLobby() {
   };
 
   const createRoom = () => {
-    console.log('EMITTING create_room')
-    if (selectedChapters.length !== 5 || !playerName.trim()) return;
+    // If it's a Mock test, we don't need chapters selected. Otherwise, require 5.
+    if ((gameType !== 'MOCK' && selectedChapters.length !== 5) || !playerName.trim()) return;
+    
     setIsConnecting(true);
     setError('');
     setQuestionsReady(false);
 
     const socket = getSocket();
-    const chapterMix = selectedChapters.map(id => {
+    const chapterMix = gameType === 'MOCK' ? [] : selectedChapters.map(id => {
       const ch = MASTER_CHAPTER_DATABASE[subject].find(c => c.id === id);
       return { id, name: ch?.name || id };
     });
-
-    console.log('EMITTING create_room:', { subject, difficulty, chapter_mix: chapterMix, player_name: playerName.trim(), user_id: authUser?.id });
 
     socket.emit('create_room', {
       subject,
@@ -302,8 +292,11 @@ export default function BattleLobby() {
       chapter_mix: chapterMix,
       player_name: playerName.trim(),
       max_players: maxPlayers,
-      time_per_question: timePerQuestion,
-      user_id: authUser?.id || `guest_${Math.random().toString(36).slice(2, 10)}`
+      time_per_question: gameType === 'MOCK' ? 180 : timePerQuestion, // Force 3 mins for Mock
+      user_id: authUser?.id || `guest_${Math.random().toString(36).slice(2, 10)}`,
+      is_pyq: gameType === 'PYQ',
+      is_mock_3hr: gameType === 'MOCK',
+      years: selectedYears
     });
   };
 
@@ -329,7 +322,7 @@ export default function BattleLobby() {
     store.setRoom(null); 
     store.resetGame();
     setShowExitConfirm(false);
-    navigate('/'); // Escape to home, breaking the mount loop
+    navigate('/'); 
   };
 
   const kickPlayer = (targetSid: string) => {
@@ -353,6 +346,10 @@ export default function BattleLobby() {
       socket.emit('start_game', { room_code: store.roomCode });
     }
   };
+
+  const isFormValid = gameType === 'MOCK' 
+    ? playerName.trim().length > 0 
+    : playerName.trim().length > 0 && selectedChapters.length === 5;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -378,28 +375,23 @@ export default function BattleLobby() {
         {popupMessage && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full space-y-4 text-center shadow-2xl">
-              
               <div className="flex justify-center mb-2">
                 <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
                   <AlertCircle className="w-6 h-6 text-yellow-400" />
                 </div>
               </div>
-              
               <h3 className="text-xl font-bold text-white">Notice</h3>
               <p className="text-slate-400">{popupMessage}</p>
-              
               <button 
                 onClick={() => setPopupMessage('')} 
                 className="w-full py-3 mt-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all font-medium text-white"
               >
                 Got it
               </button>
-              
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
 
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold mb-2">Battle Arena</h1>
@@ -434,37 +426,65 @@ export default function BattleLobby() {
       {mode === 'create' && !store.roomCode && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
           <button onClick={() => setMode('menu')} className="text-slate-400 hover:text-white text-sm">← Back</button>
+          
           <div>
             <label className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Your Name</label>
             <input type="text" value={playerName} onChange={e => setPlayerName(e.target.value)} placeholder="Enter your name" className="w-full mt-2 p-3 rounded-xl bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none" />
           </div>
+
+          {/* Battle Mode Selection */}
           <div>
-            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Subject</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {SUBJECTS.map(s => (
-                <button key={s} onClick={() => { setSubject(s); setSelectedChapters([]) }} className={cn("p-4 rounded-xl border transition-all text-left", subject === s ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-700 bg-slate-900 hover:border-slate-600")}><BookOpen className="w-5 h-5 mb-2" /><div className="font-semibold">{s}</div></button>
-              ))}
+            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Battle Mode</h3>
+            <div className="flex gap-2">
+              <button onClick={() => setGameType('AI')} className={cn("flex-1 p-3 rounded-xl border transition-all text-sm font-semibold", gameType === 'AI' ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-700 bg-slate-900")}>AI Quick Battle</button>
+              <button onClick={() => setGameType('PYQ')} className={cn("flex-1 p-3 rounded-xl border transition-all text-sm font-semibold", gameType === 'PYQ' ? "border-purple-500 bg-purple-500/20 text-purple-300" : "border-slate-700 bg-slate-900")}>PYQ Battle</button>
+              <button onClick={() => setGameType('MOCK')} className={cn("flex-1 p-3 rounded-xl border transition-all text-sm font-semibold", gameType === 'MOCK' ? "border-red-500 bg-red-500/20 text-red-300" : "border-slate-700 bg-slate-900")}>3-Hour Mock</button>
             </div>
+            
+            {(gameType === 'PYQ' || gameType === 'MOCK') && (
+              <div className="mt-4">
+                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Filter Years</h3>
+                <div className="flex flex-wrap gap-2">
+                  {AVAILABLE_YEARS.map(year => (
+                    <button key={year} onClick={() => setSelectedYears(prev => prev.includes(year) ? prev.filter(y => y !== year) : [...prev, year])} className={cn("px-3 py-1.5 rounded-lg border text-sm transition-all", selectedYears.includes(year) ? "border-purple-500 bg-purple-500/20 text-purple-300" : "border-slate-700 bg-slate-900 text-slate-400")}>{year}</button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-          <div>
-            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Difficulty</h3>
-            <div className="flex gap-3">
-              {DIFFICULTIES.map(d => (
-                <button key={d} onClick={() => setDifficulty(d)} className={cn("flex-1 p-4 rounded-xl border transition-all", difficulty === d ? (d === 'LOW' ? "border-green-500 bg-green-500/20 text-green-300" : "border-red-500 bg-red-500/20 text-red-300") : "border-slate-700 bg-slate-900 hover:border-slate-600")}><Zap className="w-5 h-5 mb-2" /><div className="font-semibold">{d === 'LOW' ? 'Foundation' : 'Advanced'}</div></button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Chapters ({selectedChapters.length}/5)</h3>
-              <button onClick={randomizeChapters} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 text-sm hover:bg-indigo-600/30 transition-colors"><Dices className="w-4 h-4" />Random 5</button>
-            </div>
-            <div className="grid md:grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-2">
-              {MASTER_CHAPTER_DATABASE[subject].map(ch => (
-                <button key={ch.id} onClick={() => toggleChapter(ch.id)} className={cn("p-3 rounded-lg border text-left text-sm transition-all", selectedChapters.includes(ch.id) ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-700 bg-slate-900 hover:border-slate-600")}><div className="flex items-center gap-2"><div className={cn("w-5 h-5 rounded border flex items-center justify-center text-xs shrink-0", selectedChapters.includes(ch.id) ? "bg-indigo-500 border-indigo-500 text-white" : "border-slate-600")}>{selectedChapters.includes(ch.id) && '✓'}</div><span className="truncate">{ch.name}</span></div></button>
-              ))}
-            </div>
-          </div>
+
+          {gameType !== 'MOCK' && (
+            <>
+              <div>
+                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Subject</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {SUBJECTS.map(s => (
+                    <button key={s} onClick={() => { setSubject(s); setSelectedChapters([]) }} className={cn("p-4 rounded-xl border transition-all text-left", subject === s ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-700 bg-slate-900 hover:border-slate-600")}><BookOpen className="w-5 h-5 mb-2" /><div className="font-semibold">{s}</div></button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Difficulty</h3>
+                <div className="flex gap-3">
+                  {DIFFICULTIES.map(d => (
+                    <button key={d} onClick={() => setDifficulty(d)} className={cn("flex-1 p-4 rounded-xl border transition-all", difficulty === d ? (d === 'LOW' ? "border-green-500 bg-green-500/20 text-green-300" : "border-red-500 bg-red-500/20 text-red-300") : "border-slate-700 bg-slate-900 hover:border-slate-600")}><Zap className="w-5 h-5 mb-2" /><div className="font-semibold">{d === 'LOW' ? 'Foundation' : 'Advanced'}</div></button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Chapters ({selectedChapters.length}/5)</h3>
+                  <button onClick={randomizeChapters} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 text-sm hover:bg-indigo-600/30 transition-colors"><Dices className="w-4 h-4" />Random 5</button>
+                </div>
+                <div className="grid md:grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-2">
+                  {MASTER_CHAPTER_DATABASE[subject].map(ch => (
+                    <button key={ch.id} onClick={() => toggleChapter(ch.id)} className={cn("p-3 rounded-lg border text-left text-sm transition-all", selectedChapters.includes(ch.id) ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-700 bg-slate-900 hover:border-slate-600")}><div className="flex items-center gap-2"><div className={cn("w-5 h-5 rounded border flex items-center justify-center text-xs shrink-0", selectedChapters.includes(ch.id) ? "bg-indigo-500 border-indigo-500 text-white" : "border-slate-600")}>{selectedChapters.includes(ch.id) && '✓'}</div><span className="truncate">{ch.name}</span></div></button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Max Players</label>
@@ -476,15 +496,33 @@ export default function BattleLobby() {
             </div>
             <div>
               <label className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Time per Q</label>
-              <div className="flex items-center gap-3 mt-2">
-                <Clock className="w-5 h-5 text-slate-500" />
-                <input type="range" min="30" max="120" step="10" value={timePerQuestion} onChange={e => setTimePerQuestion(Number(e.target.value))} className="flex-1" />
-                <span className="w-12 text-center font-mono">{timePerQuestion}s</span>
-              </div>
+              {gameType === 'MOCK' ? (
+                <div className="flex items-center gap-3 mt-2 h-10 px-3 rounded-xl bg-slate-800/50 border border-slate-700">
+                  <Clock className="w-5 h-5 text-slate-500" />
+                  <span className="text-slate-400 text-sm">180s (Fixed for Mock)</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 mt-2">
+                  <Clock className="w-5 h-5 text-slate-500" />
+                  <input type="range" min="30" max="120" step="10" value={timePerQuestion} onChange={e => setTimePerQuestion(Number(e.target.value))} className="flex-1" />
+                  <span className="w-12 text-center font-mono">{timePerQuestion}s</span>
+                </div>
+              )}
             </div>
           </div>
+
           {error && <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm flex items-center gap-2"><AlertCircle className="w-4 h-4 shrink-0" />{error}</div>}
-          <button onClick={createRoom} disabled={selectedChapters.length !== 5 || !playerName.trim() || isConnecting} className={cn("w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2", selectedChapters.length === 5 && playerName.trim() && !isConnecting ? "bg-indigo-600 hover:bg-indigo-500 hover:scale-[1.02]" : "bg-slate-800 text-slate-500 cursor-not-allowed")}>{isConnecting ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><Swords className="w-5 h-5" /> Create Battle Room</>}</button>
+          
+          <button 
+            onClick={createRoom} 
+            disabled={!isFormValid || isConnecting} 
+            className={cn(
+              "w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2", 
+              isFormValid && !isConnecting ? "bg-indigo-600 hover:bg-indigo-500 hover:scale-[1.02]" : "bg-slate-800 text-slate-500 cursor-not-allowed"
+            )}
+          >
+            {isConnecting ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><Swords className="w-5 h-5" /> Create Battle Room</>}
+          </button>
         </motion.div>
       )}
 
