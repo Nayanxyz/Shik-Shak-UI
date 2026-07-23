@@ -32,3 +32,14 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
+
+/* Fix KaTeX display block spacing issues caused by mixed database strings */
+.math-container .katex-display {
+  display: inline-block;
+  margin: 0.25em 0.2em;
+  text-align: center;
+}
+
+.math-container p, .math-container div {
+  display: inline;
+}
