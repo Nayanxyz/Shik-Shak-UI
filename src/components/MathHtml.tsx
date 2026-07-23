@@ -12,9 +12,10 @@ export default function MathHtml({ html, className }: { html: string; className?
     result = result
       .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')
-      .replace(/&gt;/, '>')
+      .replace(/&gt;/g, '>')
       .replace(/\\f/g, '\\f')
       .replace(/\\eqalign\s*\{([\s\S]*?)\}/g, (_, inner) => `$$\\begin{aligned}${inner}\\end{aligned}$$`)
+      .replace(/\\matrix\s*\{([\s\S]*?)\}/g, (_, inner) => `\\begin{matrix}${inner}\\end{matrix}`)
       .replace(/\\cr/g, '\\\\');
 
     // 2. Process Display Math ($$...$$)
