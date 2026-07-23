@@ -131,6 +131,9 @@ export default function PracticePage() {
   const [step, setStep] = useState<'select' | 'loading' | 'playing'>('select');
   const [subject, setSubject] = useState<string>(location.state?.selectedSubject || 'MATH');
   const [difficulty, setDifficulty] = useState<string>('LOW');
+  const [isPyqMode, setIsPyqMode] = useState(false);
+  const [selectedYears, setSelectedYears] = useState<number[]>([]);
+  const AVAILABLE_YEARS = [2023, 2022, 2021, 2020, 2019];
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [session, setSession] = useState<any>(null);
   const [currentQ, setCurrentQ] = useState(0);
@@ -205,11 +208,23 @@ export default function PracticePage() {
     setStep('loading');
     setError('');
     try {
-      const chapterMix = selectedChapters.map(id => ({ id, name: MASTER_CHAPTER_DATABASE[subject].find(c => c.id === id)?.name || id }));
-      const data = await apiFetch('/api/v1/practice/start', {
+      const chapterMix = selectedChapters.map(id => ({ 
+        id, 
+        name: MASTER_CHAPTER_DATABASE[subject].find(c => c.id === id)?.name || id 
+      }));
+      
+      // Route dynamically to the new PYQ endpoint or standard AI endpoint
+      const endpoint = isPyqMode ? '/api/v1/practice/pyq/start' : '/api/v1/practice/start';
+      
+      const payload = isPyqMode 
+        ? { subject, difficulty, chapter_mix: chapterMix, years: selectedYears, limit: 5 }
+        : { subject, difficulty, chapter_mix: chapterMix };
+
+      const data = await apiFetch(endpoint, {
         method: 'POST',
-        body: JSON.stringify({ subject, difficulty, chapter_mix: chapterMix }),
+        body: JSON.stringify(payload),
       });
+      
       setSession(data);
       setCurrentQ(0);
       setTimeRemaining(60);
@@ -282,6 +297,39 @@ export default function PracticePage() {
               <h1 className="text-3xl font-bold mb-2">Practice Mode</h1>
               <p className="text-slate-400">Select your subject, difficulty, and 5 chapters</p>
             </div>
+
+            {/* Mode Selection */}
+            <div>
+              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Practice Mode</h3>
+              <div className="flex gap-3 mb-6">
+                <button onClick={() => setIsPyqMode(false)} className={cn("flex-1 p-4 rounded-xl border transition-all", !isPyqMode ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-700 bg-slate-900 hover:border-slate-600")}>
+                  <div className="font-semibold flex items-center justify-center gap-2"><Brain className="w-4 h-4" /> AI Generated</div>
+                </button>
+                <button onClick={() => setIsPyqMode(true)} className={cn("flex-1 p-4 rounded-xl border transition-all", isPyqMode ? "border-purple-500 bg-purple-500/20 text-purple-300" : "border-slate-700 bg-slate-900 hover:border-slate-600")}>
+                  <div className="font-semibold flex items-center justify-center gap-2"><BookOpen className="w-4 h-4" /> Previous Year (PYQ)</div>
+                </button>
+              </div>
+              
+              {isPyqMode && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Select Years (Optional)</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {AVAILABLE_YEARS.map(year => (
+                      <button 
+                        key={year} 
+                        onClick={() => setSelectedYears(prev => prev.includes(year) ? prev.filter(y => y !== year) : [...prev, year])}
+                        className={cn("px-4 py-2 rounded-lg border text-sm transition-all", selectedYears.includes(year) ? "border-purple-500 bg-purple-500/20 text-purple-300" : "border-slate-700 bg-slate-900 text-slate-400")}
+                      >
+                        {year}
+                      </button>
+                    ))}
+                    <span className="text-xs text-slate-500 self-center ml-2">Leave blank for random years</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+
             <div>
               <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Subject</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
