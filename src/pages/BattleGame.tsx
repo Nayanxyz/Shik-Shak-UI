@@ -257,11 +257,61 @@ export default function BattleGame() {
             <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800">
               <MathHtml html={question.question_text} className="text-lg font-medium leading-relaxed" />
             </div>
-            <div className="space-y-3">
-              {question.options.map((opt: any) => (
-                <button key={opt.id} onClick={() => !hasAnswered && submitAnswer(opt.id)} disabled={hasAnswered} className={cn("w-full p-4 rounded-xl border text-left transition-all", hasAnswered ? (selectedOption === opt.id ? "border-indigo-500 bg-indigo-500/20" : "border-slate-800 opacity-50") : "border-slate-700 hover:border-indigo-500 hover:bg-slate-900")}><div className="flex items-center gap-3"><span className={cn("w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0", selectedOption === opt.id ? "bg-indigo-500 text-white" : "bg-slate-800")}>{opt.id}</span><MathHtml html={opt.text} /></div></button>
-              ))}
-            </div>
+            {/* DYNAMIC ANSWER FORM: NUMERICAL VS MCQ */}
+{isNumerical ? (
+  <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+    <label className="block text-sm font-semibold text-slate-300">
+      Enter Integer / Numerical Answer:
+    </label>
+    <div className="flex gap-3">
+      <input
+        type="text"
+        disabled={hasAnswered}
+        value={numericalInput}
+        onChange={(e) => setNumericalInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && numericalInput.trim() && !hasAnswered) {
+            submitAnswer(numericalInput.trim())
+          }
+        }}
+        placeholder="e.g. 3, 15, -2"
+        className="flex-1 max-w-xs px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-lg font-mono text-center text-white focus:outline-none focus:border-indigo-500 disabled:opacity-50"
+      />
+      {!hasAnswered && (
+        <button
+          onClick={() => submitAnswer(numericalInput.trim())}
+          disabled={!numericalInput.trim()}
+          className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold rounded-xl transition shadow-lg shadow-indigo-500/20"
+        >
+          Submit
+        </button>
+      )}
+    </div>
+  </div>
+) : (
+    <div className="space-y-3">
+      {question.options.map((opt: any) => (
+        <button 
+          key={opt.id} 
+          onClick={() => !hasAnswered && submitAnswer(opt.id)} 
+          disabled={hasAnswered} 
+          className={cn(
+            "w-full p-4 rounded-xl border text-left transition-all", 
+            hasAnswered 
+              ? (selectedOption === opt.id ? "border-indigo-500 bg-indigo-500/20" : "border-slate-800 opacity-50") 
+              : "border-slate-700 hover:border-indigo-500 hover:bg-slate-900"
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <span className={cn("w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0", selectedOption === opt.id ? "bg-indigo-500 text-white" : "bg-slate-800")}>
+              {opt.id}
+            </span>
+            <MathHtml html={opt.text} />
+          </div>
+        </button>
+      ))}
+    </div>
+  )}
             {hasAnswered && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-center">
                 <div className="flex items-center justify-center gap-2 text-indigo-300">
