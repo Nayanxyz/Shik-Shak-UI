@@ -138,6 +138,7 @@ export default function PracticePage() {
   const [session, setSession] = useState<any>(null);
   const [currentQ, setCurrentQ] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [numericalInput, setNumericalInput] = useState<string>('');
   const [timeRemaining, setTimeRemaining] = useState(60);
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState<any>(null);
