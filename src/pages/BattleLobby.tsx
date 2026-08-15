@@ -565,7 +565,10 @@ export default function BattleLobby() {
             </div>
           </div>
           {store.isHost ? (
-            <button onClick={startGame} disabled={!questionsReady} className={cn("w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2", questionsReady ? "bg-indigo-600 hover:bg-indigo-500" : "bg-slate-700 text-slate-400 cursor-not-allowed")}>{questionsReady ? <><Swords className="w-5 h-5" /> Start Battle</> : <><RefreshCw className="w-5 h-5 animate-spin" /> Generating Questions...</>}</button>
+            <button onClick={startGame} disabled={!questionsReady} className={cn("w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2", questionsReady ? "bg-indigo-600 hover:bg-indigo-500" : "bg-slate-700 text-slate-400 cursor-not-allowed")}>
+              {questionsReady ? (<><Swords className="w-5 h-5" /> Start Battle</>
+                ) : (<><RefreshCw className="w-5 h-5 animate-spin" /> {difficulty === 'HIGH' ? 'Fetching Curated Questions...' : 'Generating Questions...'}</>)}
+              </button>
           ) : (
             <div className="text-center p-4 rounded-xl bg-slate-900 border border-slate-800 text-slate-400">Waiting for host to start the battle...</div>
           )}
