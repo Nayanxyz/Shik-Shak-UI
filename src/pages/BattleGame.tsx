@@ -54,6 +54,7 @@ export default function BattleGame() {
       store.setQuestion(data, data.total_questions)
       setPhase('playing')
       setSelectedOption(null)
+      setNumericalInput('')
       setHasAnswered(false)
       setAnswerResult(null)
       startTimeRef.current = Date.now()
