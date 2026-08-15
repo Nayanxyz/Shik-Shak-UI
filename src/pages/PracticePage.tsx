@@ -230,6 +230,7 @@ export default function PracticePage() {
       setCurrentQ(0);
       setTimeRemaining(60);
       setSelectedOption(null);
+      setNumericalInput('');
       setShowResult(false);
       setStep('playing');
     } catch (e: any) {
