@@ -290,7 +290,7 @@ export default function BattleGame() {
               </div>
             ) : (
               <div className="space-y-3">
-                {question.options.map((opt: any) => (
+                {question.options?.map((opt: any) => (
                   <button 
                     key={opt.id} 
                     onClick={() => !hasAnswered && submitAnswer(opt.id)} 
