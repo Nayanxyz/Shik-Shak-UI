@@ -16,6 +16,7 @@ export default function BattleGame() {
 
   const [phase, setPhase] = useState<'playing' | 'results' | 'leaderboard' | 'finished'>('playing')
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
+  const [numericalInput, setNumericalInput] = useState<string>('')
   const [notification, setNotification] = useState<string | null>(null);
   const [forfeitMessage, setForfeitMessage] = useState<string | null>(null);
   const [hasAnswered, setHasAnswered] = useState(false)
