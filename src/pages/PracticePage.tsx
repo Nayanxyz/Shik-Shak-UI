@@ -266,6 +266,7 @@ export default function PracticePage() {
     setCurrentQ(prev => prev + 1);
     setTimeRemaining(60);
     setSelectedOption(null);
+    setNumericalInput('');
     setShowResult(false);
     setResult(null);
   };
