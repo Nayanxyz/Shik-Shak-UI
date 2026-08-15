@@ -195,6 +195,7 @@ export default function BattleGame() {
   };
 
   const question = store.questions[0]
+  const isNumerical = !question?.options || question.options.length === 0
   
   return (
     <div className="max-w-4xl mx-auto">
