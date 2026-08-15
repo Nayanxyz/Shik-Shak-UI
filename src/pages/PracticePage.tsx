@@ -272,6 +272,7 @@ export default function PracticePage() {
   };
 
   const activeQuestion = session?.questions?.[currentQ];
+  const isNumerical = !activeQuestion?.options || activeQuestion.options.length === 0;
 
   return (
     <div className="max-w-4xl mx-auto">
