@@ -390,17 +390,77 @@ export default function PracticePage() {
             <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800">
               <MathHtml html={activeQuestion.question_text} className="text-lg font-medium leading-relaxed" />
             </div>
-            <div className="space-y-3">
-              {activeQuestion.options.map((opt: any) => (
-                <button key={opt.id} onClick={() => !showResult && setSelectedOption(opt.id)} disabled={showResult} className={cn("w-full p-4 rounded-xl border text-left transition-all", showResult ? (opt.id === result?.correct_option ? "border-green-500 bg-green-500/20" : (opt.id === selectedOption ? "border-red-500 bg-red-500/20" : "border-slate-800 opacity-50")) : (selectedOption === opt.id ? "border-indigo-500 bg-indigo-500/20" : "border-slate-700 hover:border-slate-600 hover:bg-slate-900"))}>
-                  <div className="flex items-center gap-3">
-                    <span className={cn("w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0", showResult ? (opt.id === result?.correct_option ? "bg-green-500 text-white" : (opt.id === selectedOption ? "bg-red-500 text-white" : "bg-slate-800")) : (selectedOption === opt.id ? "bg-indigo-500 text-white" : "bg-slate-800"))}>{opt.id}</span><MathHtml html={opt.text} />
-                  </div>
-                </button>
-              ))}
-            </div>
+            {/* DYNAMIC ANSWER FORM: NUMERICAL VS MCQ */}
+            {isNumerical ? (
+              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                <label className="block text-sm font-semibold text-slate-300">
+                  Enter Integer / Numerical Answer:
+                </label>
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    disabled={showResult}
+                    value={numericalInput}
+                    onChange={(e) => setNumericalInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && numericalInput.trim() && !showResult) {
+                        handleSubmit(numericalInput.trim())
+                      }
+                    }}
+                    placeholder="e.g. 3, 15, -2"
+                    className="flex-1 max-w-xs px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-lg font-mono text-center text-white focus:outline-none focus:border-indigo-500 disabled:opacity-50"
+                  />
+                  {!showResult && (
+                    <button
+                      onClick={() => handleSubmit(numericalInput.trim())}
+                      disabled={!numericalInput.trim()}
+                      className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold rounded-xl transition shadow-lg shadow-indigo-500/20"
+                    >
+                      Submit
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {activeQuestion.options.map((opt: any) => (
+                  <button 
+                    key={opt.id} 
+                    onClick={() => !showResult && setSelectedOption(opt.id)} 
+                    disabled={showResult} 
+                    className={cn(
+                      "w-full p-4 rounded-xl border text-left transition-all", 
+                      showResult 
+                        ? (opt.id === result?.correct_option ? "border-green-500 bg-green-500/20" : (opt.id === selectedOption ? "border-red-500 bg-red-500/20" : "border-slate-800 opacity-50")) 
+                        : (selectedOption === opt.id ? "border-indigo-500 bg-indigo-500/20" : "border-slate-700 hover:border-slate-600 hover:bg-slate-900")
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className={cn(
+                        "w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0", 
+                        showResult 
+                          ? (opt.id === result?.correct_option ? "bg-green-500 text-white" : (opt.id === selectedOption ? "bg-red-500 text-white" : "bg-slate-800")) 
+                          : (selectedOption === opt.id ? "bg-indigo-500 text-white" : "bg-slate-800")
+                      )}>
+                        {opt.id}
+                      </span>
+                      <MathHtml html={opt.text} />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
             {!showResult ? (
-              <button onClick={() => handleSubmit(selectedOption)} disabled={!selectedOption} className={cn("w-full py-4 rounded-xl font-semibold transition-all", selectedOption ? "bg-indigo-600 hover:bg-indigo-500" : "bg-slate-800 text-slate-500 cursor-not-allowed")}>Submit Answer</button>
+              !isNumerical && (
+                <button 
+                  onClick={() => handleSubmit(selectedOption)} 
+                  disabled={!selectedOption} 
+                  className={cn("w-full py-4 rounded-xl font-semibold transition-all", selectedOption ? "bg-indigo-600 hover:bg-indigo-500" : "bg-slate-800 text-slate-500 cursor-not-allowed")}
+                >
+                  Submit Answer
+                </button>
+              )
             ) : (
               <div className="space-y-4">
                 <div className={cn("p-4 rounded-xl border flex items-center gap-3", result?.is_correct ? "border-green-500/30 bg-green-500/10" : "border-red-500/30 bg-red-500/10")}>
