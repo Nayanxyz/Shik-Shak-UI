@@ -16,7 +16,7 @@ export interface Player {
 export interface Question {
   question_number: number
   question_text: string
-  options: { id: string; text: string }[]
+  options?: { id: string; text: string }[]
   correct_option?: string
   explanation?: string
   time_limit?: number
