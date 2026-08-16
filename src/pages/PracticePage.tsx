@@ -147,20 +147,29 @@ export default function PracticePage() {
   
   const timerActiveRef = useRef(false);
 
-  const handleSubmit = useCallback(async (option: string | null) => {
+  const handleSubmit = useCallback(async (option?: string | null) => {
     if (!session || showResult) return;
+    
+    // Explicitly lock the question index for this exact submission
+    const questionNum = currentQ + 1;
+    const finalAnswer = option !== undefined && option !== null ? String(option).trim() : numericalInput.trim();
+
     try {
       const data = await apiFetch('/api/v1/practice/answer', {
         method: 'POST',
-        body: JSON.stringify({ session_id: session.session_id, question_number: currentQ + 1, selected_option: option }),
+        body: JSON.stringify({ 
+          session_id: session.session_id, 
+          question_number: questionNum, 
+          selected_option: finalAnswer || null 
+        }),
       });
       setResult(data);
       setShowResult(true);
       timerActiveRef.current = false;
     } catch (e) {
-      console.error(e);
+      console.error("Answer submission failed:", e);
     }
-  }, [session, showResult, currentQ]);
+  }, [session, showResult, currentQ, numericalInput]);
 
   useEffect(() => {
     if (location.state?.selectedSubject) {
