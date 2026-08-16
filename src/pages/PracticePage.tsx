@@ -358,7 +358,7 @@ export default function PracticePage() {
               <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Difficulty</h3>
               <div className="flex gap-3">
                 {DIFFICULTIES.map(d => (
-                  <button key={d} onClick={() => setDifficulty(d)} className={cn("flex-1 p-4 rounded-xl border transition-all", difficulty === d ? (d === 'LOW' ? "border-green-500 bg-green-500/20 text-green-300" : "border-red-500 bg-red-500/20 text-red-300") : "border-slate-700 bg-slate-900 hover:border-slate-600")}><Zap className="w-5 h-5 mb-2" /><div className="font-semibold">{d === 'LOW' ? 'Foundation' : 'Advanced'}</div><div className="text-xs text-slate-400 mt-1">{d === 'LOW' ? '2-3 min per question' : '5-8 min per question'}</div></button>
+                  <button key={d} onClick={() => setDifficulty(d)} className={cn("flex-1 p-4 rounded-xl border transition-all", difficulty === d ? (d === 'LOW' ? "border-green-500 bg-green-500/20 text-green-300" : "border-red-500 bg-red-500/20 text-red-300") : "border-slate-700 bg-slate-900 hover:border-slate-600")}><Zap className="w-5 h-5 mb-2" /><div className="font-semibold">{d === 'LOW' ? 'Foundation' : 'Advanced'}</div><div className="text-xs text-slate-400 mt-1">{d === 'LOW' ? 'class 11th-12th & JEE easy questions' : 'JEE MAIN & ADVANCED questions'}</div></button>
                 ))}
               </div>
             </div>
