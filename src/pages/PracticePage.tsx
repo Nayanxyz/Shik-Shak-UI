@@ -272,7 +272,10 @@ export default function PracticePage() {
   };
 
   const activeQuestion = session?.questions?.[currentQ];
-  const isNumerical = !activeQuestion?.options || activeQuestion.options.length === 0;
+// Checks if options are missing, empty array, OR if all option texts are blank strings
+  const isNumerical = !activeQuestion?.options || 
+    activeQuestion.options.length === 0 || 
+    activeQuestion.options.every((opt: any) => !opt.text || opt.text.trim() === '');
 
   return (
     <div className="max-w-4xl mx-auto">
