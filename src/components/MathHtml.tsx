@@ -13,12 +13,16 @@ export default function MathHtml({ html, className }: { html: string; className?
       .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
-      .replace(/\\f/g, '\\f')
       .replace(/\\eqalign\s*\{([\s\S]*?)\}/g, (_, inner) => `$$\\begin{aligned}${inner}\\end{aligned}$$`)
       .replace(/\\matrix\s*\{([\s\S]*?)\}/g, (_, inner) => `\\begin{matrix}${inner}\\end{matrix}`)
       .replace(/\\cr/g, '\\\\');
 
-    // 2. Process Display Math ($$...$$)
+    // 2. Convert standard LaTeX bracket delimiters \( \) and \[ \] to $ and $$
+    result = result
+      .replace(/\\\[([\s\S]*?)\\\]/g, (_, tex) => `$$${tex}$$`)
+      .replace(/\\\(([\s\S]*?)\\\)/g, (_, tex) => `$${tex}$`);
+
+    // 3. Process Display Math ($$...$$)
     result = result.replace(/\$\$([\s\S]*?)\$\$/g, (_, tex) => {
       try { 
         return `<div class="my-2 text-center overflow-x-auto">${katex.renderToString(tex.trim(), { throwOnError: false, displayMode: true })}</div>`; 
@@ -26,7 +30,7 @@ export default function MathHtml({ html, className }: { html: string; className?
       catch { return `$$${tex}$$`; }
     });
 
-    // 3. Process Inline Math ($...$) - ensuring we don't break inline flow
+    // 4. Process Inline Math ($...$)
     result = result.replace(/\$([^$\n]+?)\$/g, (_, tex) => {
       try { 
         return katex.renderToString(tex.trim(), { throwOnError: false, displayMode: false }); 
