@@ -195,7 +195,9 @@ export default function BattleGame() {
   };
 
   const question = store.questions[0]
-  const isNumerical = !question?.options || question.options.length === 0
+  const isNumerical = !question?.options || 
+  question.options.length === 0 || 
+  question.options.every((opt: any) => !opt.text || opt.text.trim() === '');
   
   return (
     <div className="max-w-4xl mx-auto">
