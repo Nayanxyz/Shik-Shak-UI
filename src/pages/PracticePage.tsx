@@ -404,7 +404,15 @@ export default function PracticePage() {
             </div>
             {/* DYNAMIC ANSWER FORM: NUMERICAL VS MCQ */}
             {isNumerical ? (
-              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (numericalInput.trim() && !showResult) {
+                    handleSubmit(numericalInput.trim());
+                  }
+                }}
+                className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3"
+              >
                 <label className="block text-sm font-semibold text-slate-300">
                   Enter Integer / Numerical Answer:
                 </label>
@@ -414,17 +422,12 @@ export default function PracticePage() {
                     disabled={showResult}
                     value={numericalInput}
                     onChange={(e) => setNumericalInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && numericalInput.trim() && !showResult) {
-                        handleSubmit(numericalInput.trim())
-                      }
-                    }}
                     placeholder="e.g. 3, 15, -2"
                     className="flex-1 max-w-xs px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-lg font-mono text-center text-white focus:outline-none focus:border-indigo-500 disabled:opacity-50"
                   />
                   {!showResult && (
                     <button
-                      onClick={() => handleSubmit(numericalInput.trim())}
+                      type="submit"
                       disabled={!numericalInput.trim()}
                       className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold rounded-xl transition shadow-lg shadow-indigo-500/20"
                     >
@@ -432,7 +435,7 @@ export default function PracticePage() {
                     </button>
                   )}
                 </div>
-              </div>
+              </form>
             ) : (
               <div className="space-y-3">
                 {activeQuestion.options.map((opt: any) => (
