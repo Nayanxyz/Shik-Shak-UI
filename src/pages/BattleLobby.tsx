@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Swords, Users, Clock, Plus, LogIn, Copy, Check, LogOut, Crown, UserX, RefreshCw, AlertCircle, Zap, BookOpen, Dices } from 'lucide-react'
+import { 
+  Swords, Users, Clock, Plus, LogIn, Copy, Check, LogOut, Crown, UserX, 
+  RefreshCw, AlertCircle, Zap, BookOpen, Dices, Sigma, Atom, FlaskConical, Dna 
+} from 'lucide-react'
 import { cn } from '../lib/utils'
 import { getSocket, disconnectSocket } from '../lib/socket'
 import { useGameStore } from '../store/gameStore'
@@ -11,6 +14,7 @@ const SUBJECTS = ['MATH', 'PHYSICS', 'CHEMISTRY', 'BIOLOGY'] as const
 const DIFFICULTIES = ['LOW', 'HIGH'] as const
 
 const MASTER_CHAPTER_DATABASE: Record<string, { id: string; name: string }[]> = {
+  // ... (KEEP YOUR EXACT MASTER_CHAPTER_DATABASE OBJECT HERE, UNCHANGED) ...
   MATH: [
     {"id": "M1101", "name": "Sets, Relations and Functions"},
     {"id": "M1102", "name": "Trigonometric Functions"},
@@ -273,7 +277,6 @@ export default function BattleLobby() {
   };
 
   const createRoom = () => {
-    // If it's a Mock test, we don't need chapters selected. Otherwise, require 5.
     if ((gameType !== 'MOCK' && selectedChapters.length !== 5) || !playerName.trim()) return;
     
     setIsConnecting(true);
@@ -292,7 +295,7 @@ export default function BattleLobby() {
       chapter_mix: chapterMix,
       player_name: playerName.trim(),
       max_players: maxPlayers,
-      time_per_question: gameType === 'MOCK' ? 180 : timePerQuestion, // Force 3 mins for Mock
+      time_per_question: gameType === 'MOCK' ? 180 : timePerQuestion,
       user_id: authUser?.id || `guest_${Math.random().toString(36).slice(2, 10)}`,
       is_pyq: gameType === 'PYQ',
       is_mock_3hr: gameType === 'MOCK',
@@ -355,16 +358,16 @@ export default function BattleLobby() {
     <div className="max-w-4xl mx-auto">
       <AnimatePresence>
         {showExitConfirm && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-md w-full space-y-4">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="bg-slate-900 border border-white/10 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
               <div className="flex items-center gap-3 text-yellow-400">
                 <AlertCircle className="w-6 h-6" />
                 <h3 className="text-xl font-bold">Leave Room?</h3>
               </div>
               <p className="text-slate-400">If you leave now, you'll exit the room and lose your spot.</p>
-              <div className="flex gap-3">
-                <button onClick={() => setShowExitConfirm(false)} className="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all font-medium">Stay</button>
-                <button onClick={leaveRoom} className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-500 transition-all font-medium flex items-center justify-center gap-2"><LogOut className="w-4 h-4" /> Leave</button>
+              <div className="flex gap-3 pt-2">
+                <button onClick={() => setShowExitConfirm(false)} className="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 transition-all font-medium">Stay</button>
+                <button onClick={leaveRoom} className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-500 transition-all font-medium flex items-center justify-center gap-2 shadow-lg shadow-red-500/20"><LogOut className="w-4 h-4" /> Leave</button>
               </div>
             </motion.div>
           </motion.div>
@@ -373,10 +376,10 @@ export default function BattleLobby() {
 
       <AnimatePresence>
         {popupMessage && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full space-y-4 text-center shadow-2xl">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="bg-slate-900 border border-white/10 rounded-2xl p-6 max-w-sm w-full space-y-4 text-center shadow-2xl">
               <div className="flex justify-center mb-2">
-                <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
                   <AlertCircle className="w-6 h-6 text-yellow-400" />
                 </div>
               </div>
@@ -384,7 +387,7 @@ export default function BattleLobby() {
               <p className="text-slate-400">{popupMessage}</p>
               <button 
                 onClick={() => setPopupMessage('')} 
-                className="w-full py-3 mt-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all font-medium text-white"
+                className="w-full py-3 mt-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 transition-all font-medium text-white"
               >
                 Got it
               </button>
@@ -393,11 +396,11 @@ export default function BattleLobby() {
         )}
       </AnimatePresence>
 
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">Battle Arena</h1>
+      <div className="text-center mb-10">
+        <h1 className="text-3xl font-bold mb-2 tracking-tight">Battle Arena</h1>
         <p className="text-slate-400">Create a room or join an existing battle</p>
         {disconnected && (
-          <div className="mt-4 flex items-center justify-center gap-2 text-yellow-400 text-sm">
+          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm font-medium">
             <RefreshCw className="w-4 h-4 animate-spin" />
             Reconnecting to server...
           </div>
@@ -406,47 +409,65 @@ export default function BattleLobby() {
 
       {mode === 'menu' && !store.roomCode && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid md:grid-cols-2 gap-6">
-          <button onClick={() => setMode('create')} className="p-8 rounded-2xl bg-slate-900 border border-slate-800 hover:border-indigo-500/50 transition-all hover:scale-[1.02] text-left group">
-            <div className="w-14 h-14 rounded-xl bg-indigo-500/20 flex items-center justify-center mb-4 group-hover:bg-indigo-500/30 transition-colors">
+          {/* ✨ UI UPGRADE: Enhanced hover states, shadows, and scaling */}
+          <button onClick={() => setMode('create')} className="p-8 rounded-2xl bg-slate-900/50 border border-white/5 hover:border-indigo-500/30 hover:bg-slate-900 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-500/5 text-left group">
+            <div className="w-14 h-14 rounded-xl bg-indigo-500/10 flex items-center justify-center mb-4 group-hover:bg-indigo-500/20 transition-colors">
               <Plus className="w-7 h-7 text-indigo-400" />
             </div>
-            <h3 className="text-xl font-bold mb-2">Create Room</h3>
-            <p className="text-slate-400">Host a new battle and invite friends</p>
+            <h3 className="text-xl font-bold mb-2 text-slate-100">Create Room</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">Host a new battle, customize settings, and invite friends</p>
           </button>
-          <button onClick={() => setMode('join')} className="p-8 rounded-2xl bg-slate-900 border border-slate-800 hover:border-purple-500/50 transition-all hover:scale-[1.02] text-left group">
-            <div className="w-14 h-14 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4 group-hover:bg-purple-500/30 transition-colors">
+          <button onClick={() => setMode('join')} className="p-8 rounded-2xl bg-slate-900/50 border border-white/5 hover:border-purple-500/30 hover:bg-slate-900 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/5 text-left group">
+            <div className="w-14 h-14 rounded-xl bg-purple-500/10 flex items-center justify-center mb-4 group-hover:bg-purple-500/20 transition-colors">
               <LogIn className="w-7 h-7 text-purple-400" />
             </div>
-            <h3 className="text-xl font-bold mb-2">Join Room</h3>
-            <p className="text-slate-400">Enter a room code to join a battle</p>
+            <h3 className="text-xl font-bold mb-2 text-slate-100">Join Room</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">Enter a 6-character room code to join a friend's battle</p>
           </button>
         </motion.div>
       )}
 
       {mode === 'create' && !store.roomCode && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-          <button onClick={() => setMode('menu')} className="text-slate-400 hover:text-white text-sm">← Back</button>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+          <button onClick={() => setMode('menu')} className="text-slate-400 hover:text-white text-sm flex items-center gap-1 transition-colors">← Back to Menu</button>
           
           <div>
-            <label className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Your Name</label>
-            <input type="text" value={playerName} onChange={e => setPlayerName(e.target.value)} placeholder="Enter your name" className="w-full mt-2 p-3 rounded-xl bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:outline-none" />
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2 block">Your Name</label>
+            <input 
+              type="text" 
+              value={playerName} 
+              onChange={e => setPlayerName(e.target.value)} 
+              placeholder="Enter your display name" 
+              className="w-full p-3.5 rounded-xl bg-slate-900/50 border border-white/10 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 focus:outline-none transition-all text-slate-200 placeholder:text-slate-600" 
+            />
           </div>
 
           {/* Battle Mode Selection */}
           <div>
-            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Battle Mode</h3>
-            <div className="flex gap-2">
-              <button onClick={() => setGameType('AI')} className={cn("flex-1 p-3 rounded-xl border transition-all text-sm font-semibold", gameType === 'AI' ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-700 bg-slate-900")}>AI Quick Battle</button>
-              <button onClick={() => setGameType('PYQ')} className={cn("flex-1 p-3 rounded-xl border transition-all text-sm font-semibold", gameType === 'PYQ' ? "border-purple-500 bg-purple-500/20 text-purple-300" : "border-slate-700 bg-slate-900")}>PYQ Battle</button>
-              <button onClick={() => setGameType('MOCK')} className={cn("flex-1 p-3 rounded-xl border transition-all text-sm font-semibold", gameType === 'MOCK' ? "border-red-500 bg-red-500/20 text-red-300" : "border-slate-700 bg-slate-900")}>3-Hour Mock</button>
+            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Battle Mode</h3>
+            <div className="grid grid-cols-3 gap-3">
+              <button onClick={() => setGameType('AI')} className={cn("flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all duration-200", gameType === 'AI' ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-300 shadow-sm shadow-indigo-500/10" : "border-white/5 bg-slate-900/50 text-slate-400 hover:border-white/10 hover:bg-slate-800/50")}>
+                <Zap className="w-5 h-5" />
+                <span className="font-semibold text-sm">AI Quick</span>
+              </button>
+              <button onClick={() => setGameType('PYQ')} className={cn("flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all duration-200", gameType === 'PYQ' ? "border-purple-500/50 bg-purple-500/10 text-purple-300 shadow-sm shadow-purple-500/10" : "border-white/5 bg-slate-900/50 text-slate-400 hover:border-white/10 hover:bg-slate-800/50")}>
+                <BookOpen className="w-5 h-5" />
+                <span className="font-semibold text-sm">PYQ Battle</span>
+              </button>
+              <button onClick={() => setGameType('MOCK')} className={cn("flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all duration-200", gameType === 'MOCK' ? "border-red-500/50 bg-red-500/10 text-red-300 shadow-sm shadow-red-500/10" : "border-white/5 bg-slate-900/50 text-slate-400 hover:border-white/10 hover:bg-slate-800/50")}>
+                <Clock className="w-5 h-5" />
+                <span className="font-semibold text-sm">3-Hour Mock</span>
+              </button>
             </div>
             
             {(gameType === 'PYQ' || gameType === 'MOCK') && (
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Filter Years</h3>
+              <div className="mt-6 p-4 rounded-xl bg-slate-900/30 border border-white/5">
+                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Filter Years</h3>
                 <div className="flex flex-wrap gap-2">
                   {AVAILABLE_YEARS.map(year => (
-                    <button key={year} onClick={() => setSelectedYears(prev => prev.includes(year) ? prev.filter(y => y !== year) : [...prev, year])} className={cn("px-3 py-1.5 rounded-lg border text-sm transition-all", selectedYears.includes(year) ? "border-purple-500 bg-purple-500/20 text-purple-300" : "border-slate-700 bg-slate-900 text-slate-400")}>{year}</button>
+                    <button key={year} onClick={() => setSelectedYears(prev => prev.includes(year) ? prev.filter(y => y !== year) : [...prev, year])} className={cn("px-4 py-2 rounded-lg border text-sm font-medium transition-all", selectedYears.includes(year) ? "border-purple-500/50 bg-purple-500/10 text-purple-300" : "border-white/5 bg-slate-900/50 text-slate-400 hover:border-white/10")}>
+                      {year}
+                    </button>
                   ))}
                 </div>
               </div>
@@ -456,56 +477,88 @@ export default function BattleLobby() {
           {gameType !== 'MOCK' && (
             <>
               <div>
-                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Subject</h3>
+                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Subject</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {SUBJECTS.map(s => (
-                    <button key={s} onClick={() => { setSubject(s); setSelectedChapters([]) }} className={cn("p-4 rounded-xl border transition-all text-left", subject === s ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-700 bg-slate-900 hover:border-slate-600")}><BookOpen className="w-5 h-5 mb-2" /><div className="font-semibold">{s}</div></button>
+                  {/* ✨ UI UPGRADE: Consistent professional icons matching PracticePage */}
+                  {[
+                    { id: 'MATH', icon: <Sigma className="w-5 h-5" /> },
+                    { id: 'PHYSICS', icon: <Atom className="w-5 h-5" /> },
+                    { id: 'CHEMISTRY', icon: <FlaskConical className="w-5 h-5" /> },
+                    { id: 'BIOLOGY', icon: <Dna className="w-5 h-5" /> }
+                  ].map(s => (
+                    <button key={s.id} onClick={() => { setSubject(s.id); setSelectedChapters([]) }} className={cn("p-4 rounded-xl border transition-all duration-200 text-left", subject === s.id ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-300 shadow-sm shadow-indigo-500/10" : "border-white/5 bg-slate-900/50 text-slate-400 hover:border-white/10 hover:bg-slate-800/50")}>
+                      <div className="mb-2 opacity-80">{s.icon}</div>
+                      <div className="font-semibold text-sm">{s.id}</div>
+                    </button>
                   ))}
                 </div>
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Difficulty</h3>
-                <div className="flex gap-3">
+                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Difficulty</h3>
+                <div className="grid grid-cols-2 gap-3">
                   {DIFFICULTIES.map(d => (
-                    <button key={d} onClick={() => setDifficulty(d)} className={cn("flex-1 p-4 rounded-xl border transition-all", difficulty === d ? (d === 'LOW' ? "border-green-500 bg-green-500/20 text-green-300" : "border-red-500 bg-red-500/20 text-red-300") : "border-slate-700 bg-slate-900 hover:border-slate-600")}><Zap className="w-5 h-5 mb-2" /><div className="font-semibold">{d === 'LOW' ? 'Foundation' : 'Advanced'}</div></button>
+                    <button key={d} onClick={() => setDifficulty(d)} className={cn("p-4 rounded-xl border transition-all duration-200 text-left", difficulty === d ? (d === 'LOW' ? "border-green-500/50 bg-green-500/10 text-green-300 shadow-sm shadow-green-500/10" : "border-red-500/50 bg-red-500/10 text-red-300 shadow-sm shadow-red-500/10") : "border-white/5 bg-slate-900/50 text-slate-400 hover:border-white/10 hover:bg-slate-800/50")}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Zap className="w-4 h-4" />
+                        <div className="font-semibold">{d === 'LOW' ? 'Foundation' : 'Advanced'}</div>
+                      </div>
+                      <div className="text-xs text-slate-500 leading-relaxed">{d === 'LOW' ? 'Class 11th-12th & JEE easy' : 'JEE MAIN & ADVANCED level'}</div>
+                    </button>
                   ))}
                 </div>
               </div>
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Chapters ({selectedChapters.length}/5)</h3>
-                  <button onClick={randomizeChapters} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 text-sm hover:bg-indigo-600/30 transition-colors"><Dices className="w-4 h-4" />Random 5</button>
+                  <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Chapters ({selectedChapters.length}/5)</h3>
+                  <button onClick={randomizeChapters} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-medium hover:bg-indigo-500/20 transition-colors">
+                    <Dices className="w-3.5 h-3.5" /> Random 5
+                  </button>
                 </div>
-                <div className="grid md:grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-2">
+                {/* ✨ UI UPGRADE: Clean checklist UI matching PracticePage */}
+                <div className="grid gap-2 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                   {MASTER_CHAPTER_DATABASE[subject].map(ch => (
-                    <button key={ch.id} onClick={() => toggleChapter(ch.id)} className={cn("p-3 rounded-lg border text-left text-sm transition-all", selectedChapters.includes(ch.id) ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-700 bg-slate-900 hover:border-slate-600")}><div className="flex items-center gap-2"><div className={cn("w-5 h-5 rounded border flex items-center justify-center text-xs shrink-0", selectedChapters.includes(ch.id) ? "bg-indigo-500 border-indigo-500 text-white" : "border-slate-600")}>{selectedChapters.includes(ch.id) && '✓'}</div><span className="truncate">{ch.name}</span></div></button>
+                    <button key={ch.id} onClick={() => toggleChapter(ch.id)} className={cn(
+                      "group flex items-center gap-3 p-3 rounded-xl border text-left text-sm transition-all duration-200", 
+                      selectedChapters.includes(ch.id) 
+                        ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-200 shadow-sm shadow-indigo-500/10" 
+                        : "border-white/5 bg-slate-900/50 text-slate-400 hover:border-white/10 hover:bg-slate-800/50"
+                    )}>
+                      <div className={cn(
+                        "w-5 h-5 rounded-md border flex items-center justify-center transition-all shrink-0",
+                        selectedChapters.includes(ch.id) ? "bg-indigo-500 border-indigo-500 text-white" : "border-slate-600 group-hover:border-slate-500"
+                      )}>
+                        {selectedChapters.includes(ch.id) && <Check className="w-3.5 h-3.5" />}
+                      </div>
+                      <span className="truncate font-medium">{ch.name}</span>
+                    </button>
                   ))}
                 </div>
               </div>
             </>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl bg-slate-900/30 border border-white/5">
             <div>
-              <label className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Max Players</label>
-              <div className="flex items-center gap-3 mt-2">
-                <Users className="w-5 h-5 text-slate-500" />
-                <input type="range" min="2" max="4" value={maxPlayers} onChange={e => setMaxPlayers(Number(e.target.value))} className="flex-1" />
-                <span className="w-8 text-center font-mono">{maxPlayers}</span>
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest block mb-3">Max Players</label>
+              <div className="flex items-center gap-4">
+                <Users className="w-5 h-5 text-slate-500 shrink-0" />
+                {/* ✨ UI UPGRADE: Added accent color for modern slider look */}
+                <input type="range" min="2" max="4" value={maxPlayers} onChange={e => setMaxPlayers(Number(e.target.value))} className="flex-1 accent-indigo-500 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer" />
+                <span className="w-8 text-center font-mono text-lg font-bold text-indigo-400">{maxPlayers}</span>
               </div>
             </div>
             <div>
-              <label className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Time per Q</label>
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest block mb-3">Time per Q</label>
               {gameType === 'MOCK' ? (
-                <div className="flex items-center gap-3 mt-2 h-10 px-3 rounded-xl bg-slate-800/50 border border-slate-700">
-                  <Clock className="w-5 h-5 text-slate-500" />
-                  <span className="text-slate-400 text-sm">180s (Fixed for Mock)</span>
+                <div className="flex items-center gap-3 h-10 px-3 rounded-lg bg-slate-800/50 border border-white/5">
+                  <Clock className="w-4 h-4 text-slate-500" />
+                  <span className="text-slate-400 text-sm font-medium">180s (Fixed for Mock)</span>
                 </div>
               ) : (
-                <div className="flex items-center gap-3 mt-2">
-                  <Clock className="w-5 h-5 text-slate-500" />
-                  <input type="range" min="30" max="120" step="10" value={timePerQuestion} onChange={e => setTimePerQuestion(Number(e.target.value))} className="flex-1" />
-                  <span className="w-12 text-center font-mono">{timePerQuestion}s</span>
+                <div className="flex items-center gap-4">
+                  <Clock className="w-5 h-5 text-slate-500 shrink-0" />
+                  <input type="range" min="30" max="120" step="10" value={timePerQuestion} onChange={e => setTimePerQuestion(Number(e.target.value))} className="flex-1 accent-indigo-500 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer" />
+                  <span className="w-12 text-center font-mono text-lg font-bold text-indigo-400">{timePerQuestion}s</span>
                 </div>
               )}
             </div>
@@ -517,8 +570,8 @@ export default function BattleLobby() {
             onClick={createRoom} 
             disabled={!isFormValid || isConnecting} 
             className={cn(
-              "w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2", 
-              isFormValid && !isConnecting ? "bg-indigo-600 hover:bg-indigo-500 hover:scale-[1.02]" : "bg-slate-800 text-slate-500 cursor-not-allowed"
+              "w-full py-4 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center gap-2", 
+              isFormValid && !isConnecting ? "bg-indigo-600 hover:bg-indigo-500 hover:scale-[1.01] shadow-lg shadow-indigo-500/25" : "bg-slate-800/50 text-slate-600 cursor-not-allowed border border-white/5"
             )}
           >
             {isConnecting ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><Swords className="w-5 h-5" /> Create Battle Room</>}
@@ -528,49 +581,99 @@ export default function BattleLobby() {
 
       {mode === 'join' && !store.roomCode && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 max-w-md mx-auto">
-          <button onClick={() => setMode('menu')} className="text-slate-400 hover:text-white text-sm">← Back</button>
+          <button onClick={() => setMode('menu')} className="text-slate-400 hover:text-white text-sm flex items-center gap-1 transition-colors">← Back to Menu</button>
           <div>
-            <label className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Your Name</label>
-            <input type="text" value={playerName} onChange={e => setPlayerName(e.target.value)} placeholder="Enter your name" className="w-full mt-2 p-3 rounded-xl bg-slate-900 border border-slate-700 focus:border-purple-500 focus:outline-none" />
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2 block">Your Name</label>
+            <input type="text" value={playerName} onChange={e => setPlayerName(e.target.value)} placeholder="Enter your display name" className="w-full p-3.5 rounded-xl bg-slate-900/50 border border-white/10 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 focus:outline-none transition-all text-slate-200 placeholder:text-slate-600" />
           </div>
           <div>
-            <label className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Room Code</label>
-            <input type="text" value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())} placeholder="e.g. ABC123" maxLength={6} className="w-full mt-2 p-3 rounded-xl bg-slate-900 border border-slate-700 focus:border-purple-500 focus:outline-none font-mono text-lg tracking-widest text-center uppercase" />
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2 block">Room Code</label>
+            <input type="text" value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())} placeholder="ABC123" maxLength={6} className="w-full p-4 rounded-xl bg-slate-900/50 border border-white/10 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 focus:outline-none transition-all font-mono text-2xl tracking-[0.5em] text-center uppercase text-slate-200 placeholder:text-slate-700 placeholder:tracking-normal placeholder:text-base" />
           </div>
           {error && <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm flex items-center gap-2"><AlertCircle className="w-4 h-4 shrink-0" />{error}</div>}
-          <button onClick={joinRoom} disabled={!joinCode.trim() || !playerName.trim() || isConnecting} className={cn("w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2", joinCode.trim() && playerName.trim() && !isConnecting ? "bg-purple-600 hover:bg-purple-500 hover:scale-[1.02]" : "bg-slate-800 text-slate-500 cursor-not-allowed")}>{isConnecting ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><LogIn className="w-5 h-5" /> Join Battle</>}</button>
+          <button onClick={joinRoom} disabled={!joinCode.trim() || !playerName.trim() || isConnecting} className={cn("w-full py-4 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center gap-2", joinCode.trim() && playerName.trim() && !isConnecting ? "bg-purple-600 hover:bg-purple-500 hover:scale-[1.01] shadow-lg shadow-purple-500/25" : "bg-slate-800/50 text-slate-600 cursor-not-allowed border border-white/5")}>
+            {isConnecting ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><LogIn className="w-5 h-5" /> Join Battle</>}
+          </button>
         </motion.div>
       )}
 
       {store.roomCode && (
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
-          <div className="flex items-center justify-between">
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-8">
+          <div className="flex items-start justify-between gap-4">
             <div className="text-center flex-1">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm mb-2"><Swords className="w-4 h-4" /> {store.mode} MODE</div>
-              <h2 className="text-2xl font-bold">Room: {store.roomCode}</h2>
-              <p className="text-slate-400 mt-1">{store.subject} • {store.difficulty}</p>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-3">
+                <Swords className="w-3.5 h-3.5" /> {store.mode} MODE
+              </div>
+              <h2 className="text-2xl font-bold text-slate-100">Battle Lobby</h2>
+              <p className="text-slate-400 mt-1 text-sm">{store.subject} • {store.difficulty}</p>
             </div>
-            <button onClick={() => setShowExitConfirm(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 border border-slate-700 transition-all text-sm shrink-0 ml-4"><LogOut className="w-4 h-4" /> Leave</button>
+            <button onClick={() => setShowExitConfirm(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900/50 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 border border-white/5 transition-all text-sm shrink-0 font-medium">
+              <LogOut className="w-4 h-4" /> Leave
+            </button>
           </div>
-          <div className="flex items-center justify-center gap-3">
-            <div className="px-6 py-3 rounded-xl bg-slate-900 border border-slate-700 font-mono text-2xl tracking-[0.3em]">{store.roomCode}</div>
-            <button onClick={copyCode} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors">{copied ? <Check className="w-5 h-5 text-green-400" /> : <Copy className="w-5 h-5" />}</button>
+
+          {/* ✨ UI UPGRADE: Premium Room Code Display */}
+          <div className="flex flex-col items-center justify-center gap-4 p-6 rounded-2xl bg-slate-900/30 border border-white/5 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 pointer-events-none" />
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest relative z-10">Share this code with friends</p>
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="px-8 py-4 rounded-xl bg-slate-950 border border-indigo-500/30 font-mono text-3xl tracking-[0.4em] text-indigo-300 shadow-lg shadow-indigo-500/10">
+                {store.roomCode}
+              </div>
+              <button onClick={copyCode} className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 transition-all group">
+                {copied ? <Check className="w-5 h-5 text-green-400" /> : <Copy className="w-5 h-5 text-slate-400 group-hover:text-white" />}
+              </button>
+            </div>
           </div>
-          <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
-            <h3 className="font-semibold mb-4 flex items-center gap-2"><Users className="w-5 h-5 text-slate-400" /> Players ({store.players.length})</h3>
-            <div className="space-y-2">
+
+          <div className="bg-slate-900/50 rounded-2xl border border-white/5 p-6">
+            <h3 className="font-semibold mb-4 flex items-center gap-2 text-slate-200">
+              <Users className="w-5 h-5 text-slate-400" /> 
+              Players <span className="text-slate-500 font-normal">({store.players.length} / {maxPlayers})</span>
+            </h3>
+            <div className="space-y-3">
+              {/* ✨ UI UPGRADE: Sleek player list with better avatars, host badges, and offline indicators */}
               {store.players.map((p: any) => (
-                <div key={p.sid} className={cn("flex items-center justify-between p-3 rounded-xl border", p.is_host ? "bg-yellow-500/10 border-yellow-500/30" : "bg-slate-800/50 border-slate-700")}><div className="flex items-center gap-3"><div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold", p.is_host ? "bg-yellow-500 text-yellow-950" : "bg-slate-700")}>{p.is_host ? <Crown className="w-5 h-5" /> : p.name[0]}</div><div><div className="font-medium flex items-center gap-2">{p.name}{p.is_host && <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-300">Host</span>}{!p.is_connected && <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/20 text-red-300">Disconnected</span>}</div></div></div>{store.isHost && !p.is_host && p.is_connected && <button onClick={() => kickPlayer(p.sid)} className="p-2 rounded-lg hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors" title="Kick player"><UserX className="w-4 h-4" /></button>}</div>
+                <div key={p.sid} className={cn("flex items-center justify-between p-4 rounded-xl border transition-all", p.is_host ? "bg-yellow-500/5 border-yellow-500/20" : "bg-slate-900/50 border-white/5 hover:border-white/10")}>
+                  <div className="flex items-center gap-4">
+                    <div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0", p.is_host ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30" : "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20")}>
+                      {p.is_host ? <Crown className="w-5 h-5" /> : p.name?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                    <div>
+                      <div className="font-medium text-slate-200 flex items-center gap-2 flex-wrap">
+                        {p.name}
+                        {p.is_host && <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 font-semibold">Host</span>}
+                        {!p.is_connected && (
+                          <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-semibold flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" /> Offline
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {store.isHost && !p.is_host && p.is_connected && (
+                    <button onClick={() => kickPlayer(p.sid)} className="p-2 rounded-lg hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-all" title="Kick player">
+                      <UserX className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               ))}
             </div>
           </div>
+
           {store.isHost ? (
-            <button onClick={startGame} disabled={!questionsReady} className={cn("w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2", questionsReady ? "bg-indigo-600 hover:bg-indigo-500" : "bg-slate-700 text-slate-400 cursor-not-allowed")}>
-              {questionsReady ? (<><Swords className="w-5 h-5" /> Start Battle</>
-                ) : (<><RefreshCw className="w-5 h-5 animate-spin" /> {difficulty === 'HIGH' ? 'Fetching Curated Questions...' : 'Generating Questions...'}</>)}
-              </button>
+            <button onClick={startGame} disabled={!questionsReady} className={cn("w-full py-4 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center gap-2", questionsReady ? "bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/25 hover:scale-[1.01]" : "bg-slate-800/50 text-slate-500 cursor-not-allowed border border-white/5")}>
+              {questionsReady ? (
+                <><Swords className="w-5 h-5" /> Start Battle</>
+              ) : (
+                <><RefreshCw className="w-5 h-5 animate-spin" /> {difficulty === 'HIGH' ? 'Fetching Curated Questions...' : 'Generating Questions...'}</>
+              )}
+            </button>
           ) : (
-            <div className="text-center p-4 rounded-xl bg-slate-900 border border-slate-800 text-slate-400">Waiting for host to start the battle...</div>
+            <div className="text-center p-6 rounded-xl bg-slate-900/30 border border-white/5 text-slate-400 flex flex-col items-center gap-2">
+              <RefreshCw className="w-5 h-5 animate-spin text-indigo-400" />
+              <p>Waiting for host to start the battle...</p>
+            </div>
           )}
         </motion.div>
       )}
