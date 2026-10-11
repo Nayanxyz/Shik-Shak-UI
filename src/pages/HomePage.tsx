@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Brain, Swords, Target, Users, Clock, ChevronRight, Sparkles, Sigma, Atom, FlaskConical, Dna, Leaf } from 'lucide-react'
 import { cn } from '../lib/utils'
+import { useSeasonTheme } from '../lib/seasonTheme'
 
 const features = [
   { icon: <Brain className="w-5 h-5" />, title: 'AI-Powered Questions', desc: 'Shik Shak LLM generates fresh JEE/NEET MCQs dynamically.' },
@@ -19,9 +20,9 @@ const subjects = [
 
 export default function HomePage() {
   const navigate = useNavigate()
+  const T = useSeasonTheme()
 
   return (
-    // 🌿 No background here anymore — the global NatureBackdrop shows through
     <div className="space-y-20 pb-28 relative">
       {/* Hero */}
       <section className="text-center py-12">
@@ -31,12 +32,11 @@ export default function HomePage() {
           transition={{ duration: 0.6 }}
           className="relative"
         >
-          {/* 🍃 Floating leaves framing the title */}
           <Leaf className="hidden md:block absolute -left-20 top-8 w-9 h-9 text-emerald-400/70 animate-float-soft rotate-45" />
           <Leaf className="hidden md:block absolute -right-20 top-20 w-6 h-6 text-teal-400/60 animate-float-slower -rotate-12" />
 
           <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight text-slate-900">
-            <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <span className={cn("bg-gradient-to-r bg-clip-text text-transparent", T.gradient)}>
               Shik-Shak Arena
             </span>
           </h1>
@@ -46,7 +46,7 @@ export default function HomePage() {
           <div className="flex items-center justify-center gap-4">
             <button
               onClick={() => navigate('/practice')}
-              className="flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-lg transition-all hover:scale-105 shadow-lg shadow-indigo-500/25"
+              className={cn("flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:scale-105", T.btn)}
             >
               <Brain className="w-5 h-5" />
               Start Practice
@@ -83,7 +83,7 @@ export default function HomePage() {
               </div>
               <h3 className="font-bold text-lg text-slate-900">{s.name}</h3>
               <p className="text-slate-500 text-sm mt-1">JEE/NEET level</p>
-              <div className="flex items-center gap-1 mt-4 text-sm font-medium text-slate-500 group-hover:text-indigo-600 transition-colors">
+              <div className={cn("flex items-center gap-1 mt-4 text-sm font-medium text-slate-500 transition-colors", `group-hover:${T.text}`)}>
                 Start practicing <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </motion.button>
@@ -99,9 +99,9 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 + i * 0.1 }}
-            className="p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200 hover:border-indigo-200 hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+            className={cn("p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all duration-300 hover:-translate-y-1")}
           >
-            <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4">
+            <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center mb-4", T.iconBg)}>
               {f.icon}
             </div>
             <h3 className="font-semibold mb-2 text-slate-900">{f.title}</h3>
@@ -121,7 +121,7 @@ export default function HomePage() {
             { label: 'Time Limit', value: '60s', sub: 'Per question' },
           ].map((stat) => (
             <div key={stat.label}>
-              <div className="text-3xl font-bold text-indigo-600">{stat.value}</div>
+              <div className={cn("text-3xl font-bold", T.text)}>{stat.value}</div>
               <div className="text-sm font-semibold mt-1 text-slate-900">{stat.label}</div>
               <div className="text-xs text-slate-500 mt-1">{stat.sub}</div>
             </div>
