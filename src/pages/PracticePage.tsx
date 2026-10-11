@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, Clock, CheckCircle, XCircle, ArrowRight, BookOpen, Dices, Zap } from 'lucide-react'
+import { Brain, Clock, CheckCircle, XCircle, ArrowRight, BookOpen, Dices, Zap, LogOut, AlertCircle, Check } from 'lucide-react'
 import { cn } from '../lib/utils'
 import MathHtml from '../components/MathHtml'
 import { apiFetch } from '../lib/api'
-import { LogOut, AlertCircle } from 'lucide-react'
 
 const SUBJECTS = ['MATH', 'PHYSICS', 'CHEMISTRY', 'BIOLOGY'] as const
 const DIFFICULTIES = ['LOW', 'HIGH'] as const
 
 const MASTER_CHAPTER_DATABASE: Record<string, { id: string; name: string }[]> = {
+  // ... (KEEP YOUR EXACT MASTER_CHAPTER_DATABASE OBJECT HERE, UNCHANGED) ...
   MATH: [
     {"id": "M1101", "name": "Sets, Relations and Functions"},
     {"id": "M1102", "name": "Trigonometric Functions"},
@@ -149,8 +149,6 @@ export default function PracticePage() {
 
   const handleSubmit = useCallback(async (option?: string | null) => {
     if (!session || showResult) return;
-    
-    // Explicitly lock the question index for this exact submission
     const questionNum = currentQ + 1;
     const finalAnswer = option !== undefined && option !== null ? String(option).trim() : numericalInput.trim();
 
@@ -223,9 +221,7 @@ export default function PracticePage() {
         name: MASTER_CHAPTER_DATABASE[subject].find(c => c.id === id)?.name || id 
       }));
       
-      // Route dynamically to the new PYQ endpoint or standard AI endpoint
       const endpoint = isPyqMode ? '/api/v1/practice/pyq/start' : '/api/v1/practice/start';
-      
       const payload = isPyqMode 
         ? { subject, difficulty, chapter_mix: chapterMix, years: selectedYears, limit: 5 }
         : { subject, difficulty, chapter_mix: chapterMix };
@@ -253,7 +249,6 @@ export default function PracticePage() {
       navigate('/');
       return;
     }
-
     try {
       await apiFetch('/api/v1/practice/finish', {
         method: 'POST',
@@ -281,7 +276,6 @@ export default function PracticePage() {
   };
 
   const activeQuestion = session?.questions?.[currentQ];
-// Checks if options are missing, empty array, OR if all option texts are blank strings
   const isNumerical = !activeQuestion?.options || 
     activeQuestion.options.length === 0 || 
     activeQuestion.options.every((opt: any) => !opt.text || opt.text.trim() === '');
@@ -290,16 +284,16 @@ export default function PracticePage() {
     <div className="max-w-4xl mx-auto">
       <AnimatePresence>
         {showExitConfirm && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-md w-full space-y-4">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="bg-slate-900 border border-white/10 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
               <div className="flex items-center gap-3 text-yellow-400">
                 <AlertCircle className="w-6 h-6" />
                 <h3 className="text-xl font-bold">Leave Practice?</h3>
               </div>
               <p className="text-slate-400">Your session will end and any unanswered questions will be skipped.</p>
-              <div className="flex gap-3">
-                <button onClick={() => setShowExitConfirm(false)} className="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all font-medium">Stay</button>
-                <button onClick={handleLeavePractice} className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-500 transition-all font-medium flex items-center justify-center gap-2"><LogOut className="w-4 h-4" /> Leave</button>
+              <div className="flex gap-3 pt-2">
+                <button onClick={() => setShowExitConfirm(false)} className="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 transition-all font-medium">Stay</button>
+                <button onClick={handleLeavePractice} className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-500 transition-all font-medium flex items-center justify-center gap-2 shadow-lg shadow-red-500/20"><LogOut className="w-4 h-4" /> Leave</button>
               </div>
             </motion.div>
           </motion.div>
@@ -309,32 +303,34 @@ export default function PracticePage() {
       <AnimatePresence mode="wait">
         {step === 'select' && (
           <motion.div key="select" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-8">
-            <div className="text-center">
-              <h1 className="text-3xl font-bold mb-2">Practice Mode</h1>
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold mb-2 tracking-tight">Practice Mode</h1>
               <p className="text-slate-400">Select your subject, difficulty, and 5 chapters</p>
             </div>
 
             {/* Mode Selection */}
             <div>
-              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Practice Mode</h3>
-              <div className="flex gap-3 mb-6">
-                <button onClick={() => setIsPyqMode(false)} className={cn("flex-1 p-4 rounded-xl border transition-all", !isPyqMode ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-700 bg-slate-900 hover:border-slate-600")}>
-                  <div className="font-semibold flex items-center justify-center gap-2"><Brain className="w-4 h-4" /> AI Generated</div>
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Practice Mode</h3>
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <button onClick={() => setIsPyqMode(false)} className={cn("flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all duration-200", !isPyqMode ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-300 shadow-sm shadow-indigo-500/10" : "border-white/5 bg-slate-900/50 text-slate-400 hover:border-white/10 hover:bg-slate-800/50")}>
+                  <Brain className="w-5 h-5" />
+                  <span className="font-semibold">AI Generated</span>
                 </button>
-                <button onClick={() => setIsPyqMode(true)} className={cn("flex-1 p-4 rounded-xl border transition-all", isPyqMode ? "border-purple-500 bg-purple-500/20 text-purple-300" : "border-slate-700 bg-slate-900 hover:border-slate-600")}>
-                  <div className="font-semibold flex items-center justify-center gap-2"><BookOpen className="w-4 h-4" /> Previous Year (PYQ)</div>
+                <button onClick={() => setIsPyqMode(true)} className={cn("flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all duration-200", isPyqMode ? "border-purple-500/50 bg-purple-500/10 text-purple-300 shadow-sm shadow-purple-500/10" : "border-white/5 bg-slate-900/50 text-slate-400 hover:border-white/10 hover:bg-slate-800/50")}>
+                  <BookOpen className="w-5 h-5" />
+                  <span className="font-semibold">Previous Year (PYQ)</span>
                 </button>
               </div>
               
               {isPyqMode && (
-                <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Select Years (Optional)</h3>
+                <div className="mb-6 p-4 rounded-xl bg-slate-900/30 border border-white/5">
+                  <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Select Years (Optional)</h3>
                   <div className="flex flex-wrap gap-2">
                     {AVAILABLE_YEARS.map(year => (
                       <button 
                         key={year} 
                         onClick={() => setSelectedYears(prev => prev.includes(year) ? prev.filter(y => y !== year) : [...prev, year])}
-                        className={cn("px-4 py-2 rounded-lg border text-sm transition-all", selectedYears.includes(year) ? "border-purple-500 bg-purple-500/20 text-purple-300" : "border-slate-700 bg-slate-900 text-slate-400")}
+                        className={cn("px-4 py-2 rounded-lg border text-sm font-medium transition-all", selectedYears.includes(year) ? "border-purple-500/50 bg-purple-500/10 text-purple-300" : "border-white/5 bg-slate-900/50 text-slate-400 hover:border-white/10")}
                       >
                         {year}
                       </button>
@@ -345,64 +341,119 @@ export default function PracticePage() {
               )}
             </div>
 
-
             <div>
-              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Subject</h3>
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Subject</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {SUBJECTS.map(s => (
-                  <button key={s} onClick={() => { setSubject(s); setSelectedChapters([]) }} className={cn("p-4 rounded-xl border transition-all text-left", subject === s ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-700 bg-slate-900 hover:border-slate-600")}><BookOpen className="w-5 h-5 mb-2" /><div className="font-semibold">{s}</div></button>
+                  <button key={s} onClick={() => { setSubject(s); setSelectedChapters([]) }} className={cn("p-4 rounded-xl border transition-all duration-200 text-left", subject === s ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-300 shadow-sm shadow-indigo-500/10" : "border-white/5 bg-slate-900/50 text-slate-400 hover:border-white/10 hover:bg-slate-800/50")}>
+                    <BookOpen className="w-5 h-5 mb-2 opacity-80" />
+                    <div className="font-semibold">{s}</div>
+                  </button>
                 ))}
               </div>
             </div>
+
             <div>
-              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Difficulty</h3>
-              <div className="flex gap-3">
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Difficulty</h3>
+              <div className="grid grid-cols-2 gap-3">
                 {DIFFICULTIES.map(d => (
-                  <button key={d} onClick={() => setDifficulty(d)} className={cn("flex-1 p-4 rounded-xl border transition-all", difficulty === d ? (d === 'LOW' ? "border-green-500 bg-green-500/20 text-green-300" : "border-red-500 bg-red-500/20 text-red-300") : "border-slate-700 bg-slate-900 hover:border-slate-600")}><Zap className="w-5 h-5 mb-2" /><div className="font-semibold">{d === 'LOW' ? 'Foundation' : 'Advanced'}</div><div className="text-xs text-slate-400 mt-1">{d === 'LOW' ? 'class 11th-12th & JEE easy questions' : 'JEE MAIN & ADVANCED questions'}</div></button>
+                  <button key={d} onClick={() => setDifficulty(d)} className={cn("p-4 rounded-xl border transition-all duration-200 text-left", difficulty === d ? (d === 'LOW' ? "border-green-500/50 bg-green-500/10 text-green-300 shadow-sm shadow-green-500/10" : "border-red-500/50 bg-red-500/10 text-red-300 shadow-sm shadow-red-500/10") : "border-white/5 bg-slate-900/50 text-slate-400 hover:border-white/10 hover:bg-slate-800/50")}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Zap className="w-4 h-4" />
+                      <div className="font-semibold">{d === 'LOW' ? 'Foundation' : 'Advanced'}</div>
+                    </div>
+                    <div className="text-xs text-slate-500 leading-relaxed">{d === 'LOW' ? 'Class 11th-12th & JEE easy questions' : 'JEE MAIN & ADVANCED level questions'}</div>
+                  </button>
                 ))}
               </div>
             </div>
+
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Chapters ({selectedChapters.length}/5 selected)</h3>
-                <button onClick={randomizeChapters} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 text-sm hover:bg-indigo-600/30 transition-colors"><Dices className="w-4 h-4" />Random 5</button>
+                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Chapters ({selectedChapters.length}/5 selected)</h3>
+                <button onClick={randomizeChapters} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-medium hover:bg-indigo-500/20 transition-colors">
+                  <Dices className="w-3.5 h-3.5" /> Random 5
+                </button>
               </div>
-              <div className="grid md:grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-2">
+              
+              {/* ✨ UI UPGRADE: Clean checklist UI for chapters */}
+              <div className="grid gap-2 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                 {MASTER_CHAPTER_DATABASE[subject].map(ch => (
-                  <button key={ch.id} onClick={() => toggleChapter(ch.id)} className={cn("p-3 rounded-lg border text-left text-sm transition-all", selectedChapters.includes(ch.id) ? "border-indigo-500 bg-indigo-500/20 text-indigo-300" : "border-slate-700 bg-slate-900 hover:border-slate-600")}><div className="flex items-center gap-2"><div className={cn("w-5 h-5 rounded border flex items-center justify-center text-xs shrink-0", selectedChapters.includes(ch.id) ? "bg-indigo-500 border-indigo-500 text-white" : "border-slate-600")}>{selectedChapters.includes(ch.id) && '✓'}</div><span className="truncate">{ch.name}</span></div></button>
+                  <button key={ch.id} onClick={() => toggleChapter(ch.id)} className={cn(
+                    "group flex items-center gap-3 p-3 rounded-xl border text-left text-sm transition-all duration-200", 
+                    selectedChapters.includes(ch.id) 
+                      ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-200 shadow-sm shadow-indigo-500/10" 
+                      : "border-white/5 bg-slate-900/50 text-slate-400 hover:border-white/10 hover:bg-slate-800/50"
+                  )}>
+                    <div className={cn(
+                      "w-5 h-5 rounded-md border flex items-center justify-center transition-all shrink-0",
+                      selectedChapters.includes(ch.id) ? "bg-indigo-500 border-indigo-500 text-white" : "border-slate-600 group-hover:border-slate-500"
+                    )}>
+                      {selectedChapters.includes(ch.id) && <Check className="w-3.5 h-3.5" />}
+                    </div>
+                    <span className="truncate font-medium">{ch.name}</span>
+                  </button>
                 ))}
               </div>
             </div>
-            {error && <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm">{error}</div>}
-            <button onClick={startPractice} disabled={selectedChapters.length !== 5} className={cn("w-full py-4 rounded-xl font-semibold text-lg transition-all", selectedChapters.length === 5 ? "bg-indigo-600 hover:bg-indigo-500 hover:scale-[1.02]" : "bg-slate-800 text-slate-500 cursor-not-allowed")}>Start Practice Session</button>
+
+            {error && <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm flex items-center gap-2"><AlertCircle className="w-4 h-4" /> {error}</div>}
+            
+            <button onClick={startPractice} disabled={selectedChapters.length !== 5} className={cn("w-full py-4 rounded-xl font-semibold text-lg transition-all duration-200", selectedChapters.length === 5 ? "bg-indigo-600 hover:bg-indigo-500 hover:scale-[1.01] shadow-lg shadow-indigo-500/25" : "bg-slate-800/50 text-slate-600 cursor-not-allowed border border-white/5")}>
+              Start Practice Session
+            </button>
           </motion.div>
         )}
 
         {step === 'loading' && (
           <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-32">
-            <div className="w-16 h-16 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mb-6" />
-            <h2 className="text-xl font-semibold">Generating Questions...</h2>
-            <p className="text-slate-400 mt-2">Shik Shak AI is crafting your personalized exam</p>
+            <div className="relative w-16 h-16 mb-6">
+              <div className="absolute inset-0 border-4 border-indigo-500/20 rounded-full" />
+              <div className="absolute inset-0 border-4 border-t-indigo-500 rounded-full animate-spin" />
+            </div>
+            <h2 className="text-xl font-semibold text-slate-200">Generating Questions...</h2>
+            <p className="text-slate-500 mt-2">Shik-Shak AI is crafting your personalized exam</p>
           </motion.div>
         )}
 
         {step === 'playing' && activeQuestion && (
           <motion.div key="playing" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-slate-400"><Brain className="w-4 h-4" />Question {currentQ + 1} of {session.total_questions}</div>
-              <div className={cn("flex items-center gap-2 px-4 py-2 rounded-full text-sm font-mono", timeRemaining <= 10 ? "bg-red-500/20 text-red-300" : "bg-slate-800")}><Clock className="w-4 h-4" />{timeRemaining}s</div>
-                <button onClick={() => setShowExitConfirm(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 border border-slate-700 transition-all text-sm shrink-0">
-                    <LogOut className="w-4 h-4" /> Leave
-                </button>
+              <div className="flex items-center gap-2 text-sm text-slate-400 font-medium">
+                <Brain className="w-4 h-4 text-indigo-400" />
+                Question {currentQ + 1} <span className="text-slate-600">/</span> {session.total_questions}
+              </div>
+              
+              {/* ✨ UI UPGRADE: Pulsing animation for low time */}
+              <div className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-mono font-semibold border transition-all", 
+                timeRemaining <= 10 
+                  ? "bg-red-500/10 text-red-400 border-red-500/30 animate-pulse" 
+                  : "bg-slate-900 text-slate-300 border-white/10"
+              )}>
+                <Clock className="w-4 h-4" />
+                {timeRemaining}s
+              </div>
+
+              <button onClick={() => setShowExitConfirm(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900/50 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 border border-white/5 transition-all text-sm shrink-0 font-medium">
+                <LogOut className="w-4 h-4" /> Leave
+              </button>
             </div>
             
-            <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-              <motion.div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500" initial={{ width: 0 }} animate={{ width: `${((currentQ + 1) / session.total_questions) * 100}%` }} />
+            {/* ✨ UI UPGRADE: Smoother, glowing progress bar */}
+            <div className="h-1.5 bg-slate-800/50 rounded-full overflow-hidden">
+              <motion.div 
+                className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" 
+                initial={{ width: 0 }} 
+                animate={{ width: `${((currentQ + 1) / session.total_questions) * 100}%` }} 
+                transition={{ type: "spring", bounce: 0, duration: 0.5 }}
+              />
             </div>
-            <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800">
-              <MathHtml html={activeQuestion.question_text} className="text-lg font-medium leading-relaxed" />
+
+            <div className="p-6 rounded-2xl bg-slate-900/50 border border-white/5 backdrop-blur-sm">
+              <MathHtml html={activeQuestion.question_text} className="text-lg font-medium leading-relaxed text-slate-200" />
             </div>
-            {/* DYNAMIC ANSWER FORM: NUMERICAL VS MCQ */}
+
             {isNumerical ? (
               <form 
                 onSubmit={(e) => {
@@ -411,7 +462,7 @@ export default function PracticePage() {
                     handleSubmit(numericalInput.trim());
                   }
                 }}
-                className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3"
+                className="p-5 rounded-2xl bg-slate-900/50 border border-white/5 space-y-3"
               >
                 <label className="block text-sm font-semibold text-slate-300">
                   Enter Integer / Numerical Answer:
@@ -423,13 +474,13 @@ export default function PracticePage() {
                     value={numericalInput}
                     onChange={(e) => setNumericalInput(e.target.value)}
                     placeholder="e.g. 3, 15, -2"
-                    className="flex-1 max-w-xs px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-lg font-mono text-center text-white focus:outline-none focus:border-indigo-500 disabled:opacity-50"
+                    className="flex-1 max-w-xs px-4 py-3 bg-slate-950 border border-white/10 rounded-xl text-lg font-mono text-center text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:opacity-50 transition-all"
                   />
                   {!showResult && (
                     <button
                       type="submit"
                       disabled={!numericalInput.trim()}
-                      className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold rounded-xl transition shadow-lg shadow-indigo-500/20"
+                      className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/20"
                     >
                       Submit
                     </button>
@@ -444,22 +495,26 @@ export default function PracticePage() {
                     onClick={() => !showResult && setSelectedOption(opt.id)} 
                     disabled={showResult} 
                     className={cn(
-                      "w-full p-4 rounded-xl border text-left transition-all", 
+                      "w-full p-4 rounded-xl border text-left transition-all duration-200 relative group", 
                       showResult 
-                        ? (opt.id === result?.correct_option ? "border-green-500 bg-green-500/20" : (opt.id === selectedOption ? "border-red-500 bg-red-500/20" : "border-slate-800 opacity-50")) 
-                        : (selectedOption === opt.id ? "border-indigo-500 bg-indigo-500/20" : "border-slate-700 hover:border-slate-600 hover:bg-slate-900")
+                        ? (opt.id === result?.correct_option ? "border-green-500/50 bg-green-500/10" : (opt.id === selectedOption ? "border-red-500/50 bg-red-500/10" : "border-white/5 opacity-40")) 
+                        : (selectedOption === opt.id ? "border-indigo-500/50 bg-indigo-500/10 shadow-sm shadow-indigo-500/10" : "border-white/5 bg-slate-900/30 hover:border-white/10 hover:bg-slate-800/50")
                     )}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       <span className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0", 
+                        "w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 transition-all", 
                         showResult 
-                          ? (opt.id === result?.correct_option ? "bg-green-500 text-white" : (opt.id === selectedOption ? "bg-red-500 text-white" : "bg-slate-800")) 
-                          : (selectedOption === opt.id ? "bg-indigo-500 text-white" : "bg-slate-800")
+                          ? (opt.id === result?.correct_option ? "bg-green-500 text-white" : (opt.id === selectedOption ? "bg-red-500 text-white" : "bg-slate-800 text-slate-500")) 
+                          : (selectedOption === opt.id ? "bg-indigo-500 text-white" : "bg-slate-800 text-slate-400 group-hover:bg-slate-700")
                       )}>
                         {opt.id}
                       </span>
-                      <MathHtml html={opt.text} />
+                      <MathHtml html={opt.text} className="flex-1 text-slate-200" />
+                      
+                      {/* ✨ UI UPGRADE: Clear visual feedback icons on result */}
+                      {showResult && opt.id === result?.correct_option && <CheckCircle className="w-5 h-5 text-green-400 shrink-0" />}
+                      {showResult && opt.id === selectedOption && opt.id !== result?.correct_option && <XCircle className="w-5 h-5 text-red-400 shrink-0" />}
                     </div>
                   </button>
                 ))}
@@ -471,21 +526,28 @@ export default function PracticePage() {
                 <button 
                   onClick={() => handleSubmit(selectedOption)} 
                   disabled={!selectedOption} 
-                  className={cn("w-full py-4 rounded-xl font-semibold transition-all", selectedOption ? "bg-indigo-600 hover:bg-indigo-500" : "bg-slate-800 text-slate-500 cursor-not-allowed")}
+                  className={cn("w-full py-4 rounded-xl font-semibold transition-all duration-200", selectedOption ? "bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/25" : "bg-slate-800/50 text-slate-600 cursor-not-allowed border border-white/5")}
                 >
                   Submit Answer
                 </button>
               )
             ) : (
               <div className="space-y-4">
-                <div className={cn("p-4 rounded-xl border flex items-center gap-3", result?.is_correct ? "border-green-500/30 bg-green-500/10" : "border-red-500/30 bg-red-500/10")}>
-                  {result?.is_correct ? <CheckCircle className="w-6 h-6 text-green-400 shrink-0" /> : <XCircle className="w-6 h-6 text-red-400 shrink-0" />}
+                <div className={cn("p-4 rounded-xl border flex items-start gap-3", result?.is_correct ? "border-green-500/30 bg-green-500/10" : "border-red-500/30 bg-red-500/10")}>
+                  {result?.is_correct ? <CheckCircle className="w-6 h-6 text-green-400 shrink-0 mt-0.5" /> : <XCircle className="w-6 h-6 text-red-400 shrink-0 mt-0.5" />}
                   <div>
-                    <div className={cn("font-semibold", result?.is_correct ? "text-green-300" : "text-red-300")}>{result?.is_correct ? `Correct! +${result.score} points` : 'Incorrect (-1 point)'}</div>
-                    <MathHtml html={result?.explanation || ''} className="text-sm text-slate-400 mt-1" />
+                    <div className={cn("font-semibold text-lg", result?.is_correct ? "text-green-300" : "text-red-300")}>
+                      {result?.is_correct ? `Correct! +${result.score} points` : 'Incorrect (-1 point)'}
+                    </div>
+                    {result?.explanation && (
+                      <MathHtml html={result.explanation} className="text-sm text-slate-400 mt-2 leading-relaxed" />
+                    )}
                   </div>
                 </div>
-                <button onClick={nextQuestion} className="w-full py-4 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500 transition-all flex items-center justify-center gap-2">{currentQ + 1 >= session.total_questions ? 'View Results' : 'Next Question'}<ArrowRight className="w-5 h-5" /></button>
+                <button onClick={nextQuestion} className="w-full py-4 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25">
+                  {currentQ + 1 >= session.total_questions ? 'View Results' : 'Next Question'}
+                  <ArrowRight className="w-5 h-5" />
+                </button>
               </div>
             )}
           </motion.div>
