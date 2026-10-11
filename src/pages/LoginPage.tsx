@@ -92,7 +92,7 @@ export default function LoginPage() {
 
   return (
     // ✨ UI UPGRADE: Light mode background with subtle dot pattern
-    <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50 bg-dot-pattern">
+    <div className="min-h-screen flex items-center justify-center px-4 relative">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
