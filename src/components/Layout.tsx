@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Swords, Brain, LogOut, User } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import NatureBackdrop from './NatureBackdrop';
+import SeasonSelector from './SeasonSelector';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((s) => s.user);
@@ -14,11 +15,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    // 🌿 Light base — the NatureBackdrop paints sky, sparkles, clouds & hills behind everything
     <div className="min-h-screen text-slate-900 relative">
       <NatureBackdrop />
 
-      <nav className="relative border-b border-slate-200/70 bg-white/70 backdrop-blur-md sticky top-0 z-50">
+      <nav className="relative border-b border-white/60 bg-white/60 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 font-bold text-xl group">
             <div className="p-1.5 rounded-lg bg-indigo-500/10 group-hover:bg-indigo-500/20 transition-colors">
@@ -47,7 +47,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             {user ? (
               <div className="flex items-center gap-3 ml-2 pl-3 border-l border-slate-200">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm text-sm">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 border border-slate-200 shadow-sm text-sm">
                   <div className="w-5 h-5 rounded-full bg-indigo-500/10 flex items-center justify-center">
                     <User className="w-3 h-3 text-indigo-600" />
                   </div>
@@ -76,6 +76,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <main className="relative max-w-6xl mx-auto px-4 py-8">
         {children}
       </main>
+
+      <SeasonSelector />
     </div>
   );
 }
