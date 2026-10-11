@@ -3,11 +3,14 @@ import { Swords, Brain, LogOut, User } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import NatureBackdrop from './NatureBackdrop';
 import SeasonSelector from './SeasonSelector';
+import { useSeasonTheme } from '../lib/seasonTheme';
+import { cn } from '../lib/utils';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((s) => s.user);
   const signOut = useAuthStore((s) => s.signOut);
   const navigate = useNavigate();
+  const T = useSeasonTheme();
 
   const handleSignOut = async () => {
     await signOut();
@@ -21,10 +24,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <nav className="relative border-b border-white/60 bg-white/60 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 font-bold text-xl group">
-            <div className="p-1.5 rounded-lg bg-indigo-500/10 group-hover:bg-indigo-500/20 transition-colors">
-              <Swords className="w-5 h-5 text-indigo-600" />
+            <div className={cn("p-1.5 rounded-lg group-hover:brightness-110 transition-all", T.iconBg)}>
+              <Swords className="w-5 h-5" />
             </div>
-            <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <span className={cn("bg-gradient-to-r bg-clip-text text-transparent", T.gradient)}>
               Shik-Shak
             </span>
           </Link>
@@ -48,8 +51,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {user ? (
               <div className="flex items-center gap-3 ml-2 pl-3 border-l border-slate-200">
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 border border-slate-200 shadow-sm text-sm">
-                  <div className="w-5 h-5 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                    <User className="w-3 h-3 text-indigo-600" />
+                  <div className={cn("w-5 h-5 rounded-full flex items-center justify-center", T.iconBg)}>
+                    <User className="w-3 h-3" />
                   </div>
                   <span className="text-slate-700 font-medium">{user.username}</span>
                 </div>
@@ -64,7 +67,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             ) : (
               <Link
                 to="/login"
-                className="ml-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-all shadow-lg shadow-indigo-500/20"
+                className={cn("ml-2 px-4 py-2 rounded-lg text-white text-sm font-semibold transition-all", T.btn)}
               >
                 Sign In
               </Link>
