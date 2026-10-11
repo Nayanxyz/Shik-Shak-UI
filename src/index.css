@@ -4,7 +4,6 @@
 
 @layer base {
   body {
-    /* ✨ UI UPGRADE: Bright, premium light mode base */
     @apply bg-slate-50 text-slate-900;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -16,33 +15,37 @@
   .text-balance {
     text-wrap: balance;
   }
-  
-  /* ✨ UI UPGRADE: Subtle premium dot pattern for light backgrounds */
+
   .bg-dot-pattern {
     background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
     background-size: 24px 24px;
   }
+
+  /* 🌿 NATURE THEME: bright sky → mint → warm cream, with a soft sun glow top-right */
+  .bg-sky-meadow {
+    background:
+      radial-gradient(1100px 500px at 85% -5%, rgba(253, 230, 138, 0.55), transparent 60%),
+      radial-gradient(900px 500px at -10% 30%, rgba(186, 230, 253, 0.5), transparent 60%),
+      linear-gradient(180deg, #f0f9ff 0%, #ecfdf5 55%, #fefce8 100%);
+  }
 }
 
-/* ✨ UI UPGRADE: Clean, modern light-mode scrollbar */
+/* Clean light-mode scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1; /* slate-300 */
+  background: #cbd5e1;
   border-radius: 9999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8; /* slate-400 */
+  background: #94a3b8;
   background-clip: content-box;
 }
 
@@ -52,7 +55,6 @@
   margin: 0.25em 0.2em;
   text-align: center;
 }
-
 .math-container p, .math-container div {
   display: inline;
 }
