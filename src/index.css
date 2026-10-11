@@ -4,8 +4,11 @@
 
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100;
+    /* ✨ UI UPGRADE: Bright, premium light mode base */
+    @apply bg-slate-50 text-slate-900;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -13,27 +16,37 @@
   .text-balance {
     text-wrap: balance;
   }
+  
+  /* ✨ UI UPGRADE: Subtle premium dot pattern for light backgrounds */
+  .bg-dot-pattern {
+    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
 }
 
-/* Custom scrollbar */
+/* ✨ UI UPGRADE: Clean, modern light-mode scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
+  background: #cbd5e1; /* slate-300 */
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #94a3b8; /* slate-400 */
+  background-clip: content-box;
 }
 
-/* Fix KaTeX display block spacing issues caused by mixed database strings */
+/* Fix KaTeX display block spacing issues */
 .math-container .katex-display {
   display: inline-block;
   margin: 0.25em 0.2em;
