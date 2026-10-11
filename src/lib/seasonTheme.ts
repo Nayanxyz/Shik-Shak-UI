@@ -1,18 +1,17 @@
 import { useThemeStore, type Season } from '../store/themeStore'
 
 export interface SeasonTheme {
-  btn: string        // solid CTA buttons
-  btnSoft: string    // tinted secondary buttons
-  solid: string      // small solid badges (option letters, avatars)
-  text: string       // accent text
-  textSoft: string   // softer accent text
-  gradient: string   // hero/score gradient text
-  border: string     // accent borders
-  softBg: string     // tinted backgrounds (banners, chips)
-  ring: string       // input focus rings
-  chipActive: string // active selector cards
-  bar: string        // progress bar gradient
-  iconBg: string     // icon tiles
+  btn: string
+  btnSoft: string
+  solid: string
+  text: string
+  gradient: string
+  border: string
+  softBg: string
+  ring: string
+  chipActive: string
+  bar: string
+  iconBg: string
 }
 
 export const seasonThemes: Record<Season, SeasonTheme> = {
@@ -21,7 +20,6 @@ export const seasonThemes: Record<Season, SeasonTheme> = {
     btnSoft: 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100',
     solid: 'bg-rose-500 text-white',
     text: 'text-rose-600',
-    textSoft: 'text-rose-500',
     gradient: 'from-rose-500 via-pink-500 to-fuchsia-500',
     border: 'border-rose-300',
     softBg: 'bg-rose-50',
@@ -35,7 +33,6 @@ export const seasonThemes: Record<Season, SeasonTheme> = {
     btnSoft: 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100',
     solid: 'bg-amber-500 text-white',
     text: 'text-amber-600',
-    textSoft: 'text-amber-600',
     gradient: 'from-amber-500 via-orange-500 to-yellow-500',
     border: 'border-amber-300',
     softBg: 'bg-amber-50',
@@ -49,7 +46,6 @@ export const seasonThemes: Record<Season, SeasonTheme> = {
     btnSoft: 'bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100',
     solid: 'bg-orange-600 text-white',
     text: 'text-orange-700',
-    textSoft: 'text-orange-600',
     gradient: 'from-orange-600 via-red-500 to-amber-500',
     border: 'border-orange-300',
     softBg: 'bg-orange-50',
@@ -63,7 +59,6 @@ export const seasonThemes: Record<Season, SeasonTheme> = {
     btnSoft: 'bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100',
     solid: 'bg-sky-600 text-white',
     text: 'text-sky-700',
-    textSoft: 'text-sky-600',
     gradient: 'from-sky-600 via-blue-500 to-indigo-500',
     border: 'border-sky-300',
     softBg: 'bg-sky-50',
