@@ -6,12 +6,15 @@ function seeded(seed: number) {
   return x - Math.floor(x)
 }
 
+type TreeKind = 'blossom' | 'full' | 'autumn' | 'bare'
+
 interface Palette {
   sky: string
   hills: { fill: string; opacity: number }[]
   trunk: string
-  canopy: { fill: string; size: 'full' | 'sparse' | 'none' }[]
-  blossoms?: string
+  treeKind: TreeKind
+  canopy: { base: string; shade: string; light: string }
+  blossom?: string
   groundDecor?: { color: string; type: 'leaf' | 'snow' }[]
   sunColor: string
   sunGlow: string
@@ -26,13 +29,14 @@ const palettes: Record<Season, Palette> = {
   spring: {
     sky: 'bg-sky-spring',
     hills: [
-      { fill: '#e4d5b7', opacity: 0.85 },
-      { fill: '#d4be8e', opacity: 0.85 },
-      { fill: '#b89b6a', opacity: 0.85 },
+      { fill: '#e4d5b7', opacity: 0.9 },
+      { fill: '#d4be8e', opacity: 0.9 },
+      { fill: '#b89b6a', opacity: 0.9 },
     ],
     trunk: '#8b6f47',
-    canopy: [{ fill: '#bbf7d0', size: 'full' }],
-    blossoms: '#fbcfe8',
+    treeKind: 'blossom',
+    canopy: { base: '#a7f3d0', shade: '#6ee7b7', light: '#d1fae5' },
+    blossom: '#f9a8d4',
     sunColor: 'bg-rose-200/70',
     sunGlow: 'bg-rose-100/80',
     particleColor: '#fbcfe8',
@@ -44,12 +48,13 @@ const palettes: Record<Season, Palette> = {
   summer: {
     sky: 'bg-sky-summer',
     hills: [
-      { fill: '#c4a97d', opacity: 0.85 },
-      { fill: '#a88968', opacity: 0.85 },
-      { fill: '#8b6f47', opacity: 0.85 },
+      { fill: '#c4a97d', opacity: 0.9 },
+      { fill: '#a88968', opacity: 0.9 },
+      { fill: '#8b6f47', opacity: 0.9 },
     ],
     trunk: '#78553a',
-    canopy: [{ fill: '#86efac', size: 'full' }],
+    treeKind: 'full',
+    canopy: { base: '#4ade80', shade: '#22c55e', light: '#86efac' },
     sunColor: 'bg-amber-300/80',
     sunGlow: 'bg-amber-200/70',
     particleColor: '#fcd34d',
@@ -61,15 +66,13 @@ const palettes: Record<Season, Palette> = {
   autumn: {
     sky: 'bg-sky-autumn',
     hills: [
-      { fill: '#94856d', opacity: 0.85 },
-      { fill: '#78716c', opacity: 0.85 },
-      { fill: '#57534e', opacity: 0.85 },
+      { fill: '#94856d', opacity: 0.9 },
+      { fill: '#78716c', opacity: 0.9 },
+      { fill: '#57534e', opacity: 0.9 },
     ],
     trunk: '#5c3d24',
-    canopy: [
-      { fill: '#fb923c', size: 'sparse' },
-      { fill: '#dc2626', size: 'sparse' },
-    ],
+    treeKind: 'autumn',
+    canopy: { base: '#fb923c', shade: '#ea580c', light: '#fdba74' },
     groundDecor: [
       { color: '#ea580c', type: 'leaf' },
       { color: '#dc2626', type: 'leaf' },
@@ -86,12 +89,13 @@ const palettes: Record<Season, Palette> = {
   winter: {
     sky: 'bg-sky-winter',
     hills: [
-      { fill: '#94a3b8', opacity: 0.85 },
-      { fill: '#64748b', opacity: 0.85 },
-      { fill: '#475569', opacity: 0.85 },
+      { fill: '#94a3b8', opacity: 0.9 },
+      { fill: '#64748b', opacity: 0.9 },
+      { fill: '#475569', opacity: 0.9 },
     ],
-    trunk: '#3f3f46',
-    canopy: [{ fill: '#3f3f46', size: 'none' }],
+    trunk: '#44403c',
+    treeKind: 'bare',
+    canopy: { base: '#44403c', shade: '#292524', light: '#57534e' },
     groundDecor: [{ color: '#f8fafc', type: 'snow' }],
     sunColor: 'bg-sky-200/80',
     sunGlow: 'bg-sky-100/70',
@@ -103,66 +107,81 @@ const palettes: Record<Season, Palette> = {
   },
 }
 
+/* 🌳 Richer flat-vector tree: ground shadow, curved trunk with roots,
+   layered canopy (shade + highlight), blossoms / autumn clusters / snow */
 function Tree({ palette, scale = 1, flip = false }: { palette: Palette; scale?: number; flip?: boolean }) {
+  const { trunk, canopy, treeKind, blossom } = palette
   return (
     <svg
-      width={120 * scale}
-      height={160 * scale}
-      viewBox="0 0 120 160"
-      style={{ transform: flip ? 'scaleX(-1)' : undefined }}
+      width={140 * scale}
+      height={190 * scale}
+      viewBox="0 0 140 190"
+      style={{ transform: flip ? 'scaleX(-1)' : undefined, display: 'block' }}
     >
-      <path d="M 55 80 L 65 80 L 67 160 L 53 160 Z" fill={palette.trunk} />
+      {/* ground shadow — sells the "planted" look */}
+      <ellipse cx="70" cy="184" rx="38" ry="6" fill="#000" opacity="0.08" />
 
-      {palette.canopy.map((c, i) => {
-        if (c.size === 'full') {
-          return (
-            <g key={i}>
-              <circle cx="60" cy="55" r="42" fill={c.fill} />
-              <circle cx="40" cy="70" r="24" fill={c.fill} />
-              <circle cx="80" cy="70" r="24" fill={c.fill} />
-            </g>
-          )
-        }
-        if (c.size === 'sparse') {
-          return (
-            <g key={i}>
-              <circle cx="60" cy="55" r="28" fill={c.fill} opacity="0.9" />
-              <circle cx="42" cy="65" r="14" fill={c.fill} opacity="0.8" />
-              <circle cx="78" cy="62" r="12" fill={c.fill} opacity="0.8" />
-            </g>
-          )
-        }
-        return null
-      })}
+      {/* trunk with slight curve + root flares */}
+      <path d="M 65 96 C 65 126 63 156 60 184 L 80 184 C 77 156 75 126 75 96 Z" fill={trunk} />
+      <path d="M 60 184 Q 50 178 44 184" stroke={trunk} strokeWidth="5" fill="none" strokeLinecap="round" />
+      <path d="M 80 184 Q 90 178 96 184" stroke={trunk} strokeWidth="5" fill="none" strokeLinecap="round" />
 
-      {(palette.canopy[0].size === 'sparse' || palette.canopy[0].size === 'none') && (
-        <g stroke={palette.trunk} strokeWidth="3" fill="none" strokeLinecap="round">
-          <path d="M 60 80 Q 40 60 20 45" />
-          <path d="M 60 80 Q 80 60 100 45" />
-          <path d="M 60 80 Q 55 55 45 25" />
-          <path d="M 60 80 Q 65 55 75 25" />
-          <path d="M 20 45 Q 15 38 8 35" />
-          <path d="M 100 45 Q 105 38 112 35" />
+      {/* branches (autumn + bare) */}
+      {(treeKind === 'autumn' || treeKind === 'bare') && (
+        <g stroke={trunk} fill="none" strokeLinecap="round">
+          <path d="M 70 100 C 70 82 66 70 56 54" strokeWidth="6" />
+          <path d="M 70 100 C 70 82 76 68 86 52" strokeWidth="6" />
+          <path d="M 56 54 Q 48 44 40 40" strokeWidth="3.5" />
+          <path d="M 86 52 Q 94 42 102 38" strokeWidth="3.5" />
+          <path d="M 70 96 C 70 76 70 64 70 44" strokeWidth="4.5" />
+          <path d="M 70 60 Q 62 50 58 44" strokeWidth="3" />
+          <path d="M 70 66 Q 78 56 84 50" strokeWidth="3" />
         </g>
       )}
 
-      {palette.blossoms && (
-        <g fill={palette.blossoms}>
-          <circle cx="45" cy="45" r="3" />
-          <circle cx="70" cy="38" r="3" />
-          <circle cx="55" cy="60" r="3" />
-          <circle cx="80" cy="58" r="3" />
-          <circle cx="35" cy="62" r="3" />
-          <circle cx="65" cy="72" r="3" />
+      {/* canopy */}
+      {(treeKind === 'full' || treeKind === 'blossom') && (
+        <g>
+          <circle cx="44" cy="78" r="26" fill={canopy.base} />
+          <circle cx="96" cy="78" r="26" fill={canopy.base} />
+          <circle cx="70" cy="60" r="44" fill={canopy.base} />
+          <circle cx="62" cy="88" r="26" fill={canopy.shade} opacity="0.5" />
+          <circle cx="56" cy="42" r="20" fill={canopy.light} opacity="0.85" />
         </g>
       )}
 
-      {palette.canopy[0].size === 'none' && (
-        <g fill="#f8fafc">
-          <ellipse cx="20" cy="44" rx="6" ry="2" />
-          <ellipse cx="100" cy="44" rx="6" ry="2" />
-          <ellipse cx="45" cy="24" rx="5" ry="2" />
-          <ellipse cx="75" cy="24" rx="5" ry="2" />
+      {treeKind === 'autumn' && (
+        <g>
+          <circle cx="70" cy="56" r="30" fill={canopy.base} opacity="0.95" />
+          <circle cx="50" cy="70" r="16" fill={canopy.shade} opacity="0.9" />
+          <circle cx="90" cy="64" r="14" fill="#facc15" opacity="0.9" />
+          <circle cx="80" cy="42" r="12" fill={canopy.light} opacity="0.9" />
+          <circle cx="58" cy="46" r="10" fill={canopy.shade} opacity="0.75" />
+        </g>
+      )}
+
+      {/* blossom dots (spring) */}
+      {treeKind === 'blossom' && blossom && (
+        <g fill={blossom}>
+          <circle cx="52" cy="48" r="3.5" />
+          <circle cx="78" cy="40" r="3.5" />
+          <circle cx="64" cy="66" r="3.5" />
+          <circle cx="90" cy="62" r="3.5" />
+          <circle cx="42" cy="70" r="3.5" />
+          <circle cx="74" cy="82" r="3.5" />
+          <circle cx="98" cy="80" r="3.5" />
+        </g>
+      )}
+
+      {/* snow on branches + snow mound (winter) */}
+      {treeKind === 'bare' && (
+        <g>
+          <ellipse cx="40" cy="39" rx="7" ry="2.5" fill="#f8fafc" />
+          <ellipse cx="102" cy="37" rx="7" ry="2.5" fill="#f8fafc" />
+          <ellipse cx="70" cy="43" rx="6" ry="2.5" fill="#f8fafc" />
+          <ellipse cx="58" cy="43" rx="5" ry="2" fill="#f1f5f9" />
+          <ellipse cx="84" cy="49" rx="5" ry="2" fill="#f1f5f9" />
+          <ellipse cx="70" cy="184" rx="30" ry="7" fill="#ffffff" opacity="0.9" />
         </g>
       )}
     </svg>
@@ -207,7 +226,6 @@ export default function NatureBackdrop() {
     []
   )
 
-  // ✅ FIXED: groundDecor is an ARRAY — check its first entry's type
   const decorType = palette.groundDecor?.[0]?.type
 
   return (
@@ -234,7 +252,7 @@ export default function NatureBackdrop() {
           />
         ))}
 
-      {/* 💨 Wind streaks — present in ALL seasons */}
+      {/* 💨 Wind moves ONLY leaves/particles/streaks — never the trees */}
       {windLines.map((w, i) => (
         <div
           key={`w-${i}`}
@@ -250,7 +268,6 @@ export default function NatureBackdrop() {
         />
       ))}
 
-      {/* Falling petals / leaves / snow */}
       {palette.particleType !== 'sparkle' &&
         particles.map((p, i) => (
           <div
@@ -287,23 +304,28 @@ export default function NatureBackdrop() {
           </div>
         ))}
 
-      {/* 🌳 Seasonal trees */}
-      <div className="absolute bottom-16 left-[4%] animate-float-slower">
+      {/* 🌳 PLANTED trees — no float animation, sitting on the hills */}
+      <div className="absolute bottom-24 md:bottom-32 left-[12%] opacity-80">
+        <Tree palette={palette} scale={0.55} />
+      </div>
+      <div className="absolute bottom-16 md:bottom-24 left-[3%]">
         <Tree palette={palette} scale={0.85} />
       </div>
-      <div className="absolute bottom-20 left-[22%] animate-float-soft">
-        <Tree palette={palette} scale={1} flip />
+      <div className="absolute bottom-20 md:bottom-28 left-[24%]">
+        <Tree palette={palette} scale={1.05} flip />
       </div>
-      <div className="absolute bottom-16 right-[20%] animate-float-slower">
-        <Tree palette={palette} scale={1.05} />
+      <div className="absolute bottom-24 md:bottom-32 right-[14%] opacity-80">
+        <Tree palette={palette} scale={0.6} flip />
       </div>
-      <div className="absolute bottom-20 right-[4%] animate-float-soft">
+      <div className="absolute bottom-16 md:bottom-24 right-[22%]">
+        <Tree palette={palette} scale={1} />
+      </div>
+      <div className="absolute bottom-20 md:bottom-28 right-[3%]">
         <Tree palette={palette} scale={0.9} flip />
       </div>
 
-      {/* Ground decor */}
       {decorType === 'leaf' && (
-        <div className="absolute bottom-12 left-0 right-0 flex justify-around px-8">
+        <div className="absolute bottom-10 left-0 right-0 flex justify-around px-8">
           {palette.groundDecor!.map((d, i) => (
             <svg key={i} width="18" height="14" viewBox="0 0 26 20" className="rotate-90">
               <path d="M 2 10 Q 13 2 24 10 Q 13 18 2 10 Z" fill={d.color} />
@@ -319,7 +341,6 @@ export default function NatureBackdrop() {
         </>
       )}
 
-      {/* ⛰️ Rolling hills */}
       <svg
         className="absolute bottom-0 left-0 w-full h-40 md:h-56"
         viewBox="0 0 1440 320"
