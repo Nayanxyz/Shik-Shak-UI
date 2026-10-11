@@ -4,13 +4,19 @@ export interface Player {
   sid: string
   user_id: string
   name: string
-  avatar_url?: string
+  avatar_url?: string // ✅ Already here! Ready for photo uploads.
   is_host: boolean
   is_connected: boolean
   total_score: number
   correct_count: number
   wrong_count: number
   time_limit?: number
+  
+  // ✨ UI UPGRADE: Gamification & Profile fields (ready for backend integration)
+  xp?: number
+  level?: number
+  streak?: number
+  badge?: string // e.g., "Speed Demon", "Top 10%"
 }
 
 export interface Question {
