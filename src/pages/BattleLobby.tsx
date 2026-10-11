@@ -10,7 +10,7 @@ import { getSocket, disconnectSocket } from '../lib/socket'
 import { useGameStore } from '../store/gameStore'
 import { useAuthStore } from '../store/authStore'
 
-const SUBJECTS = ['MATH', 'PHYSICS', 'CHEMISTRY', 'BIOLOGY'] as const
+
 const DIFFICULTIES = ['LOW', 'HIGH'] as const
 
 const MASTER_CHAPTER_DATABASE: Record<string, { id: string; name: string }[]> = {
