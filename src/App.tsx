@@ -12,6 +12,7 @@ import LoginPage from './pages/LoginPage';
 import AuthCallback from './pages/AuthCallback';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import ProfilePage from './pages/ProfilePage';
 
 function AppRoutes() {
   const location = useLocation();
@@ -30,6 +31,7 @@ function AppRoutes() {
           
           <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
           <Route path="/practice" element={<ProtectedRoute><PracticePage /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/battle/lobby" element={<ProtectedRoute><BattleLobby /></ProtectedRoute>} />
           <Route path="/battle/game/:roomCode" element={<ProtectedRoute><BattleGame /></ProtectedRoute>} />
           <Route path="/practice/results" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
