@@ -6,6 +6,7 @@ import { cn } from '../lib/utils'
 import MathHtml from '../components/MathHtml'
 import { apiFetch } from '../lib/api'
 import { useSeasonTheme } from '../lib/seasonTheme'
+import { useGameStore } from '../store/gameStore'
 
 const SUBJECTS = ['MATH', 'PHYSICS', 'CHEMISTRY', 'BIOLOGY'] as const
 const DIFFICULTIES = ['LOW', 'HIGH'] as const
