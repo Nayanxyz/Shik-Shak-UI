@@ -150,14 +150,14 @@ export default function PracticePage() {
       const payload = isPyqMode ? { subject, difficulty, chapter_mix: chapterMix, years: selectedYears, limit: 5 } : { subject, difficulty, chapter_mix: chapterMix };
       const data = await apiFetch(endpoint, { method: 'POST', body: JSON.stringify(payload) });
       setSession(data); setCurrentQ(0); setTimeRemaining(60); setSelectedOption(null); setNumericalInput(''); setShowResult(false); setStep('playing');
-    } catch (e: any) { setError(e.message); setStep('select'); }
+    } catch (e: any) { setError(e.message); setStep('select'); setPracticeActive(false); }
   };
 
   const handleLeavePractice = async () => {
     if (!session?.session_id) { navigate('/'); return; }
     try { await apiFetch('/api/v1/practice/finish', { method: 'POST', body: JSON.stringify({ session_id: session.session_id }) }); }
     catch (e) { console.error("Failed to finish practice session cleanly:", e); }
-    finally { setShowExitConfirm(false); navigate('/'); }
+    finally { setShowExitConfirm(false); setPracticeActive(false); navigate('/'); }
   };
 
   const nextQuestion = () => {
