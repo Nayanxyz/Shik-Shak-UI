@@ -46,6 +46,7 @@ interface GameState {
   questionResults: any | null
   leaderboard: any[] | null
   finalRankings: any[] | null
+  practiceActive: boolean
 
   setConnected: (connected: boolean) => void
   setRoom: (room: any) => void
@@ -57,6 +58,7 @@ interface GameState {
   setQuestionResults: (results: any) => void
   setLeaderboard: (lb: any[]) => void
   setFinalRankings: (rankings: any[]) => void
+  setPracticeActive: (active: boolean) => void
   resetGame: () => void
 }
 
@@ -78,6 +80,7 @@ export const useGameStore = create<GameState>((set) => ({
   questionResults: null,
   leaderboard: null,
   finalRankings: null,
+  practiceActive: false,
 
   setConnected: (connected) => set({ isConnected: connected }),
 
@@ -123,6 +126,7 @@ export const useGameStore = create<GameState>((set) => ({
   setQuestionResults: (results) => set({ questionResults: results }),
   setLeaderboard: (lb) => set({ leaderboard: lb }),
   setFinalRankings: (rankings) => set({ finalRankings: rankings }),
+  setPracticeActive: (active) => set({ practiceActive: active }),
 
   resetGame: () => set({
     isConnected: false,
