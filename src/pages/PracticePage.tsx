@@ -161,7 +161,7 @@ export default function PracticePage() {
   };
 
   const nextQuestion = () => {
-    if (currentQ + 1 >= session.total_questions) { navigate('/practice/results', { state: { sessionId: session.session_id } }); return; }
+    if (currentQ + 1 >= session.total_questions) { setPracticeActive(false); navigate('/practice/results', { state: { sessionId: session.session_id } }); return; }
     setCurrentQ(prev => prev + 1); setTimeRemaining(60); setSelectedOption(null); setNumericalInput(''); setShowResult(false); setResult(null);
   };
 
