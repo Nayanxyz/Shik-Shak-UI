@@ -10,6 +10,9 @@ import { getSocket, disconnectSocket } from '../lib/socket'
 import { useGameStore } from '../store/gameStore'
 import { useAuthStore } from '../store/authStore'
 import { useSeasonTheme } from '../lib/seasonTheme'
+import InviteFriendsModal from '../components/InviteFriendsModal'
+import IncomingInvites from '../components/IncomingInvites'
+
 
 const DIFFICULTIES = ['LOW', 'HIGH'] as const
 
@@ -153,6 +156,7 @@ export default function BattleLobby() {
   const [disconnected, setDisconnected] = useState(false)
   const [questionsReady, setQuestionsReady] = useState(false)
   const [popupMessage, setPopupMessage] = useState('')
+  const [showInvite, setShowInvite] = useState(false)
 
   const listenersAttached = useRef(false)
 
@@ -220,11 +224,12 @@ export default function BattleLobby() {
     })
   }
 
-  const joinRoom = () => {
-    if (!joinCode.trim() || !playerName.trim()) return
+  const joinRoom = (codeOverride?: string) => {
+    const code = (codeOverride || joinCode).trim()
+    if (!code || !playerName.trim()) return
     setIsConnecting(true); setError('')
     const socket = getSocket()
-    socket.emit('join_room', { room_code: joinCode.trim().toUpperCase(), player_name: playerName.trim(), user_id: authUser?.id })
+    socket.emit('join_room', { room_code: code.toUpperCase(), player_name: playerName.trim(), user_id: authUser?.id })
   }
 
   const leaveRoom = () => {
@@ -291,6 +296,9 @@ export default function BattleLobby() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <IncomingInvites active={!store.roomCode} onJoin={(c) => joinRoom(c)} />
+      <InviteFriendsModal open={showInvite && !!store.roomCode} onClose={() => setShowInvite(false)} roomCode={store.roomCode || ''} />  
 
       <div className="text-center mb-10">
         <h1 className="text-3xl font-bold mb-2 tracking-tight text-slate-900">Battle Arena</h1>
@@ -482,7 +490,7 @@ export default function BattleLobby() {
               className={cn("w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none transition-all font-mono text-2xl tracking-[0.5em] text-center uppercase text-slate-900 placeholder:text-slate-300 placeholder:tracking-normal placeholder:text-base", T.ring)} />
           </div>
           {error && <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2"><AlertCircle className="w-4 h-4 shrink-0" />{error}</div>}
-          <button onClick={joinRoom} disabled={!joinCode.trim() || !playerName.trim() || isConnecting}
+          <button onClick={() => joinRoom()} disabled={!joinCode.trim() || !playerName.trim() || isConnecting}
             className={cn("w-full py-4 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center gap-2", joinCode.trim() && playerName.trim() && !isConnecting ? cn(T.btn, "hover:scale-[1.01]") : "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-200")}>
             {isConnecting ? <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <><LogIn className="w-5 h-5" /> Join Battle</>}
           </button>
@@ -499,9 +507,14 @@ export default function BattleLobby() {
               <h2 className="text-2xl font-bold text-slate-900">Battle Lobby</h2>
               <p className="text-slate-600 mt-1 text-sm">{store.subject} • {store.difficulty}</p>
             </div>
-            <button onClick={() => setShowExitConfirm(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-red-50 hover:text-red-600 border border-slate-200 hover:border-red-200 transition-all text-sm shrink-0 font-medium text-slate-600">
-              <LogOut className="w-4 h-4" /> Leave
-            </button>
+            <div className="flex gap-2 shrink-0">
+              <button onClick={() => setShowInvite(true)} className={cn('flex items-center gap-2 px-4 py-2 rounded-xl border transition-all text-sm font-medium', T.btnSoft)}>
+                <Users className="w-4 h-4" /> Invite
+              </button>
+              <button onClick={() => setShowExitConfirm(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-red-50 hover:text-red-600 border border-slate-200 hover:border-red-200 transition-all text-sm font-medium text-slate-600">
+                <LogOut className="w-4 h-4" /> Leave
+              </button>
+            </div>
           </div>
 
           <div className="flex flex-col items-center justify-center gap-4 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200 relative overflow-hidden shadow-sm">
