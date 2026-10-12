@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Swords, Brain, LogOut, User } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import { useGameStore } from '../store/gameStore';
 import NatureBackdrop from './NatureBackdrop';
 import SeasonSelector from './SeasonSelector';
 import { useSeasonTheme } from '../lib/seasonTheme';
