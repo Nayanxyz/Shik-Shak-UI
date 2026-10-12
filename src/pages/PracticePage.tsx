@@ -87,6 +87,7 @@ export default function PracticePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const T = useSeasonTheme();
+  const setPracticeActive = useGameStore((s) => s.setPracticeActive);
   const [step, setStep] = useState<'select' | 'loading' | 'playing'>('select');
   const [subject, setSubject] = useState<string>(location.state?.selectedSubject || 'MATH');
   const [difficulty, setDifficulty] = useState<string>('LOW');
@@ -142,7 +143,7 @@ export default function PracticePage() {
 
   const startPractice = async () => {
     if (selectedChapters.length !== 5) return;
-    setStep('loading'); setError('');
+    setStep('loading'); setError(''); setPracticeActive(true);
     try {
       const chapterMix = selectedChapters.map(id => ({ id, name: MASTER_CHAPTER_DATABASE[subject].find(c => c.id === id)?.name || id }));
       const endpoint = isPyqMode ? '/api/v1/practice/pyq/start' : '/api/v1/practice/start';
