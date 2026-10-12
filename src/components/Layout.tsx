@@ -12,10 +12,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const signOut = useAuthStore((s) => s.signOut);
   const navigate = useNavigate();
   const T = useSeasonTheme();
+  const roomCode = useGameStore((s) => s.roomCode);
+  const setRoom = useGameStore((s) => s.setRoom);
+  const resetGame = useGameStore((s) => s.resetGame);
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/login');
+  };
+
+  const safeNavigate = (e: React.MouseEvent, to: string) => {
+    e.preventDefault();
+    if (roomCode) {
+      if (!window.confirm('You are in an active battle room. Leave and reset?')) {
+        return;
+      }
+      setRoom(null);
+      resetGame();
+    }
+    navigate(to);
   };
 
   return (
