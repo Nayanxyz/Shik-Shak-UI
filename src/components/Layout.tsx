@@ -103,12 +103,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             {user ? (
               <div className="flex items-center gap-2 sm:gap-3 ml-1 sm:ml-2 pl-2 sm:pl-3 border-l border-slate-200 min-w-0">
-                <div className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-full bg-white/80 border border-slate-200 shadow-sm text-sm min-w-0">
-                  <div className={cn("w-5 h-5 rounded-full flex items-center justify-center shrink-0", T.iconBg)}>
-                    <User className="w-3 h-3" />
-                  </div>
+                <button onClick={(e) => safeNavigate(e, '/profile')} className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-full bg-white/80 border border-slate-200 shadow-sm text-sm min-w-0 hover:bg-white transition-all">
+                  {user.avatar_url ? (
+                    <img src={user.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <div className={cn("w-5 h-5 rounded-full flex items-center justify-center shrink-0", T.iconBg)}>
+                      <User className="w-3 h-3" />
+                    </div>
+                  )}
                   <span className="text-slate-700 font-medium truncate max-w-[6rem] sm:max-w-[10rem]">{user.username}</span>
-                </div>
+                </button>
                 <button onClick={handleSignOut} className="p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all shrink-0" title="Sign Out">
                   <LogOut className="w-4 h-4" />
                 </button>
