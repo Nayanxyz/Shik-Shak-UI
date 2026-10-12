@@ -448,6 +448,23 @@ export default function BattleLobby() {
             className={cn("w-full py-4 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center gap-2", isFormValid && !isConnecting ? cn(T.btn, "hover:scale-[1.01]") : "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-200")}>
             {isConnecting ? <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <><Swords className="w-5 h-5" /> Create Battle Room</>}
           </button>
+
+          {isConnecting && (
+            <button
+              onClick={() => {
+                disconnectSocket()
+                store.setRoom(null)
+                store.resetGame()
+                setIsConnecting(false)
+                setError('')
+                setMode('menu')
+              }}
+              className="w-full py-3 rounded-xl font-medium text-sm text-slate-600 hover:text-red-600 hover:bg-red-50 border border-slate-200 hover:border-red-200 transition-all flex items-center justify-center gap-2"
+            >
+              <XCircle className="w-4 h-4" />
+              Cancel Generation
+            </button>
+          )}
         </motion.div>
       )}
 
