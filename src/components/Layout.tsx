@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Swords, Brain, LogOut, User, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useGameStore } from '../store/gameStore';
+import { heartbeat } from '../lib/supabase';
 import NatureBackdrop from './NatureBackdrop';
 import SeasonSelector from './SeasonSelector';
 import { useSeasonTheme } from '../lib/seasonTheme';
@@ -21,6 +22,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const setPracticeActive = useGameStore((s) => s.setPracticeActive);
 
   const [pendingNav, setPendingNav] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    heartbeat(user.id);
+    const t = setInterval(() => heartbeat(user.id), 45000);
+    return () => clearInterval(t);
+  }, [user?.id]);
 
   const handleSignOut = async () => {
     await signOut();
