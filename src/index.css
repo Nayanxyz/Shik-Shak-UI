@@ -76,3 +76,14 @@
 .math-container p, .math-container div {
   display: inline;
 }
+
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100dvh;
+  overflow-x: clip;
+}
