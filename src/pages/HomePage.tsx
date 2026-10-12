@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Brain, Swords, Target, Users, Clock, ChevronRight, Sparkles, Sigma, Atom, FlaskConical, Dna, Leaf } from 'lucide-react'
+import { Brain, Swords, Target, Users, Clock, ChevronRight, Sparkles, Sigma, Atom, FlaskConical, Dna} from 'lucide-react'
 import { cn } from '../lib/utils'
 import { useSeasonTheme } from '../lib/seasonTheme'
 
@@ -32,9 +32,6 @@ export default function HomePage() {
           transition={{ duration: 0.6 }}
           className="relative"
         >
-          <Leaf className="hidden md:block absolute -left-20 top-8 w-9 h-9 text-emerald-400/70 animate-float-soft rotate-45" />
-          <Leaf className="hidden md:block absolute -right-20 top-20 w-6 h-6 text-teal-400/60 animate-float-slower -rotate-12" />
-
           <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight text-slate-900">
             <span className={cn("bg-gradient-to-r bg-clip-text text-transparent", T.gradient)}>
               Shik-Shak Arena
