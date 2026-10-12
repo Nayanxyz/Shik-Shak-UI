@@ -56,13 +56,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <Brain className="w-4 h-4" />
               Practice
             </button>
-            <Link
-              to="/battle/lobby"
+            <button
+              onClick={(e) => safeNavigate(e, '/battle/lobby')}
               className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/80 transition-all text-sm font-medium text-slate-600 hover:text-slate-900"
             >
               <Swords className="w-4 h-4" />
               Battle
-            </Link>
+            </button>
 
             {user ? (
               <div className="flex items-center gap-3 ml-2 pl-3 border-l border-slate-200">
