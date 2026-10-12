@@ -186,7 +186,7 @@ export default function BattleLobby() {
       socket.off('player_kicked')
       listenersAttached.current = false
     }
-  }, [navigate, store])
+  }, []);
 
   useEffect(() => {
     if (!store.roomCode) {
