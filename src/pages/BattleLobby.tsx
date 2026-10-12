@@ -499,15 +499,16 @@ export default function BattleLobby() {
 
       {store.roomCode && (
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-8">
-          <div className="flex items-start justify-between gap-4">
-            <div className="text-center flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-start gap-3">
+            <div className="hidden sm:block" />
+            <div className="text-center">
               <div className={cn("inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold uppercase tracking-wider mb-3", T.btnSoft)}>
                 <Swords className="w-3.5 h-3.5" /> {store.mode} MODE
               </div>
               <h2 className="text-2xl font-bold text-slate-900">Battle Lobby</h2>
               <p className="text-slate-600 mt-1 text-sm">{store.subject} • {store.difficulty}</p>
             </div>
-            <div className="flex gap-2 shrink-0">
+            <div className="flex gap-2 shrink-0 sm:justify-end">
               <button onClick={() => setShowInvite(true)} className={cn('flex items-center gap-2 px-4 py-2 rounded-xl border transition-all text-sm font-medium', T.btnSoft)}>
                 <Users className="w-4 h-4" /> Invite
               </button>
