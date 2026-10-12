@@ -61,3 +61,35 @@ export const upsertProfile = async (profile: {
     .single();
   return { data, error };
 };
+
+export const updateProfile = async (id: string, fields: Record<string, any>) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update(fields)
+    .eq('id', id)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const isUsernameTaken = async (username: string, excludeId: string) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('username', username)
+    .neq('id', excludeId)
+    .maybeSingle();
+  return { taken: !!data, error };
+};
+
+export const uploadAvatar = async (userId: string, file: File) => {
+  const ext = (file.name.split('.').pop() || 'png').toLowerCase();
+  const path = `${userId}/avatar-${Date.now()}.${ext}`;
+  const { error } = await supabase.storage.from('avatars').upload(path, file, {
+    upsert: true,
+    contentType: file.type || `image/${ext}`,
+  });
+  if (error) return { url: null as string | null, error };
+  const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+  return { url: data.publicUrl as string | null, error: null as null | Error };
+};
