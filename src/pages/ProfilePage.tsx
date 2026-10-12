@@ -10,6 +10,7 @@ import { useAuthStore } from '../store/authStore'
 import { useSeasonTheme } from '../lib/seasonTheme'
 import { useThemeStore } from '../store/themeStore'
 import { isUsernameTaken, updateProfile, uploadAvatar } from '../lib/supabase'
+import FriendsPanel from '../components/FriendsPanel'
 
 interface Stats { battles: number; wins: number; practice: number; questions: number; correct: number; streak: number }
 
@@ -280,6 +281,8 @@ export default function ProfilePage() {
           })}
         </div>
       </motion.div>
+
+      <FriendsPanel />
 
       {/* Settings */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className={cn(glass, "p-6 space-y-3")}>
