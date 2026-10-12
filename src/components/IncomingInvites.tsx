@@ -4,7 +4,7 @@ import { Swords, X } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { useAuthStore } from '../store/authStore'
 import { useSeasonTheme } from '../lib/seasonTheme'
-import { getMyInvites, deleteInvite } from '../lib/supabase'
+import { supabase, getMyInvites, deleteInvite } from '../lib/supabase'
 
 export default function IncomingInvites({ active, onJoin }: { active: boolean; onJoin: (code: string) => void }) {
   const user = useAuthStore((s) => s.user)
@@ -19,8 +19,19 @@ export default function IncomingInvites({ active, onJoin }: { active: boolean; o
       if (on) setInvites(data)
     }
     load()
-    const t = setInterval(load, 10000)
-    return () => { on = false; clearInterval(t) }
+
+    // ⚡ Instant push when a new invite row is inserted
+    const channel = supabase
+      .channel(`room_invites_${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'room_invites', filter: `to_id=eq.${user.id}` },
+        () => load()
+      )
+      .subscribe()
+
+    const t = setInterval(load, 8000) // safety-net fallback
+    return () => { on = false; clearInterval(t); supabase.removeChannel(channel) }
   }, [user, active])
 
   if (!active || invites.length === 0) return null
