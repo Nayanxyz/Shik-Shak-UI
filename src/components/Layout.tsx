@@ -39,14 +39,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <nav className="relative border-b border-white/60 bg-white/60 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 font-bold text-xl group">
+          <button onClick={(e) => safeNavigate(e, '/')} className="flex items-center gap-2.5 font-bold text-xl group">
             <div className={cn("p-1.5 rounded-lg group-hover:brightness-110 transition-all", T.iconBg)}>
               <Swords className="w-5 h-5" />
             </div>
             <span className={cn("bg-gradient-to-r bg-clip-text text-transparent", T.gradient)}>
               Shik-Shak
             </span>
-          </Link>
+          </button>
 
           <div className="flex items-center gap-2">
             <Link
