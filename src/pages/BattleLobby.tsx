@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Swords, Users, Clock, Plus, LogIn, Copy, Check, LogOut, Crown, UserX, 
-  RefreshCw, AlertCircle, Zap, BookOpen, Dices, Sigma, Atom, FlaskConical, Dna 
+  RefreshCw, AlertCircle, Zap, BookOpen, Dices, Sigma, Atom, FlaskConical, Dna, XCircle
 } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { getSocket, disconnectSocket } from '../lib/socket'
