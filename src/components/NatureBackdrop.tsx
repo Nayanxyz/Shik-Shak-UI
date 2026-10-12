@@ -33,9 +33,9 @@ const palettes: Record<Season, Palette> = {
       { fill: '#d4be8e', opacity: 0.9 },
       { fill: '#b89b6a', opacity: 0.9 },
     ],
-    trunk: '#8b6f47',
+    trunk: '#8b5a3c',
     treeKind: 'blossom',
-    canopy: { base: '#a7f3d0', shade: '#6ee7b7', light: '#d1fae5' },
+    canopy: { base: '#86efac', shade: '#6ee7b7', light: '#bbf7d0' },
     blossom: '#f9a8d4',
     sunColor: 'bg-rose-200/70',
     sunGlow: 'bg-rose-100/80',
@@ -52,7 +52,7 @@ const palettes: Record<Season, Palette> = {
       { fill: '#a88968', opacity: 0.9 },
       { fill: '#8b6f47', opacity: 0.9 },
     ],
-    trunk: '#78553a',
+    trunk: '#7c4a2d',
     treeKind: 'full',
     canopy: { base: '#4ade80', shade: '#22c55e', light: '#86efac' },
     sunColor: 'bg-amber-300/80',
@@ -70,9 +70,9 @@ const palettes: Record<Season, Palette> = {
       { fill: '#78716c', opacity: 0.9 },
       { fill: '#57534e', opacity: 0.9 },
     ],
-    trunk: '#5c3d24',
+    trunk: '#7c4a2d',
     treeKind: 'autumn',
-    canopy: { base: '#fb923c', shade: '#ea580c', light: '#fdba74' },
+    canopy: { base: '#fb923c', shade: '#ea580c', light: '#fbbf24' },
     groundDecor: [
       { color: '#ea580c', type: 'leaf' },
       { color: '#dc2626', type: 'leaf' },
@@ -93,9 +93,9 @@ const palettes: Record<Season, Palette> = {
       { fill: '#64748b', opacity: 0.9 },
       { fill: '#475569', opacity: 0.9 },
     ],
-    trunk: '#44403c',
+    trunk: '#7d5a4a',
     treeKind: 'bare',
-    canopy: { base: '#44403c', shade: '#292524', light: '#57534e' },
+    canopy: { base: '#57534e', shade: '#44403c', light: '#78716c' },
     groundDecor: [{ color: '#f8fafc', type: 'snow' }],
     sunColor: 'bg-sky-200/80',
     sunGlow: 'bg-sky-100/70',
@@ -107,81 +107,157 @@ const palettes: Record<Season, Palette> = {
   },
 }
 
-/* 🌳 Richer flat-vector tree: ground shadow, curved trunk with roots,
-   layered canopy (shade + highlight), blossoms / autumn clusters / snow */
+/* Branch-tip coordinates — foliage clusters sit on these (Image 1 style) */
+const TIPS: [number, number][] = [
+  [40, 96], [54, 84], [66, 64], [86, 46], [100, 36],
+  [114, 46], [134, 64], [146, 84], [160, 96],
+]
+
+/* 🌳 Ground mound: grass (spring/summer), leaf litter (autumn), snow (winter) */
+function Mound({ kind }: { kind: TreeKind }) {
+  if (kind === 'bare') {
+    return (
+      <g>
+        <ellipse cx="100" cy="222" rx="50" ry="11" fill="#f1f5f9" />
+        <ellipse cx="100" cy="225" rx="48" ry="8" fill="#e2e8f0" opacity="0.8" />
+      </g>
+    )
+  }
+  if (kind === 'autumn') {
+    return (
+      <g>
+        <ellipse cx="100" cy="222" rx="50" ry="11" fill="#d9c08f" />
+        <ellipse cx="100" cy="224" rx="48" ry="8" fill="#c4a97d" opacity="0.7" />
+        <ellipse cx="100" cy="219" rx="20" ry="6" fill="#ea580c" opacity="0.7" />
+        <ellipse cx="82" cy="221" rx="3.5" ry="1.8" fill="#dc2626" />
+        <ellipse cx="118" cy="222" rx="3.5" ry="1.8" fill="#ca8a04" />
+        <ellipse cx="66" cy="223" rx="3" ry="1.5" fill="#ea580c" />
+        <ellipse cx="134" cy="223" rx="3" ry="1.5" fill="#dc2626" />
+      </g>
+    )
+  }
+  const green = kind === 'blossom' ? '#86efac' : '#4ade80'
+  const greenDark = kind === 'blossom' ? '#4ade80' : '#22c55e'
+  return (
+    <g>
+      <ellipse cx="100" cy="222" rx="50" ry="11" fill={green} />
+      <ellipse cx="100" cy="225" rx="48" ry="8" fill={greenDark} opacity="0.5" />
+      <g stroke={greenDark} strokeWidth="2" fill="none" strokeLinecap="round">
+        <path d="M 60 216 q 1 -7 3 -1 q 1 -8 3 -1 q 1 -6 3 0" />
+        <path d="M 131 216 q 1 -7 3 -1 q 1 -8 3 -1 q 1 -6 3 0" />
+      </g>
+      {kind === 'blossom' && (
+        <g fill="#f9a8d4">
+          <circle cx="76" cy="220" r="2" />
+          <circle cx="122" cy="221" r="2" />
+          <circle cx="100" cy="225" r="2" />
+        </g>
+      )}
+    </g>
+  )
+}
+
+/* 🌳 Flat-vector tree: branch skeleton + clustered foliage + ground mound */
 function Tree({ palette, scale = 1, flip = false }: { palette: Palette; scale?: number; flip?: boolean }) {
-  const { trunk, canopy, treeKind, blossom } = palette
+  const kind = palette.treeKind
+  const trunk = palette.trunk
+  const c = palette.canopy
+
   return (
     <svg
-      width={140 * scale}
-      height={190 * scale}
-      viewBox="0 0 140 190"
+      width={200 * scale}
+      height={240 * scale}
+      viewBox="0 0 200 240"
       style={{ transform: flip ? 'scaleX(-1)' : undefined, display: 'block' }}
     >
-      {/* ground shadow — sells the "planted" look */}
-      <ellipse cx="70" cy="184" rx="38" ry="6" fill="#000" opacity="0.08" />
+      {/* soft contact shadow */}
+      <ellipse cx="100" cy="229" rx="44" ry="6" fill="#000" opacity="0.07" />
 
-      {/* trunk with slight curve + root flares */}
-      <path d="M 65 96 C 65 126 63 156 60 184 L 80 184 C 77 156 75 126 75 96 Z" fill={trunk} />
-      <path d="M 60 184 Q 50 178 44 184" stroke={trunk} strokeWidth="5" fill="none" strokeLinecap="round" />
-      <path d="M 80 184 Q 90 178 96 184" stroke={trunk} strokeWidth="5" fill="none" strokeLinecap="round" />
+      {/* ground mound (tree is PLANTED in it) */}
+      <Mound kind={kind} />
 
-      {/* branches (autumn + bare) */}
-      {(treeKind === 'autumn' || treeKind === 'bare') && (
-        <g stroke={trunk} fill="none" strokeLinecap="round">
-          <path d="M 70 100 C 70 82 66 70 56 54" strokeWidth="6" />
-          <path d="M 70 100 C 70 82 76 68 86 52" strokeWidth="6" />
-          <path d="M 56 54 Q 48 44 40 40" strokeWidth="3.5" />
-          <path d="M 86 52 Q 94 42 102 38" strokeWidth="3.5" />
-          <path d="M 70 96 C 70 76 70 64 70 44" strokeWidth="4.5" />
-          <path d="M 70 60 Q 62 50 58 44" strokeWidth="3" />
-          <path d="M 70 66 Q 78 56 84 50" strokeWidth="3" />
-        </g>
-      )}
+      {/* trunk with root flare */}
+      <path d="M 92 224 C 94 196 95 172 96 150 L 104 150 C 105 172 106 196 108 224 C 104 221 96 221 92 224 Z" fill={trunk} />
+      <path d="M 101 224 C 102 196 103 172 103 150 L 104 150 C 105 172 106 196 108 224 C 106 222 103 222 101 224 Z" fill="#000" opacity="0.15" />
 
-      {/* canopy */}
-      {(treeKind === 'full' || treeKind === 'blossom') && (
+      {/* branch skeleton — always visible (Image 1 style) */}
+      <g stroke={trunk} fill="none" strokeLinecap="round">
+        <path d="M 100 152 C 92 132 78 118 62 108" strokeWidth="7" />
+        <path d="M 100 152 C 108 132 122 118 138 108" strokeWidth="7" />
+        <path d="M 100 150 C 96 124 90 104 82 84" strokeWidth="6" />
+        <path d="M 100 150 C 104 124 110 104 118 84" strokeWidth="6" />
+        <path d="M 100 148 C 100 120 100 96 100 70" strokeWidth="5" />
+        <path d="M 62 108 C 54 102 48 98 40 96" strokeWidth="3.5" />
+        <path d="M 62 108 C 58 98 56 92 54 84" strokeWidth="3.5" />
+        <path d="M 138 108 C 146 102 152 98 160 96" strokeWidth="3.5" />
+        <path d="M 138 108 C 142 98 144 92 146 84" strokeWidth="3.5" />
+        <path d="M 82 84 C 76 76 72 70 66 64" strokeWidth="3" />
+        <path d="M 118 84 C 124 76 128 70 134 64" strokeWidth="3" />
+        <path d="M 100 70 C 94 60 90 54 86 46" strokeWidth="3" />
+        <path d="M 100 70 C 106 60 110 54 114 46" strokeWidth="3" />
+      </g>
+
+      {/* 🌸 SPRING: sparse young leaf-clusters at branch tips + blossoms */}
+      {kind === 'blossom' && (
         <g>
-          <circle cx="44" cy="78" r="26" fill={canopy.base} />
-          <circle cx="96" cy="78" r="26" fill={canopy.base} />
-          <circle cx="70" cy="60" r="44" fill={canopy.base} />
-          <circle cx="62" cy="88" r="26" fill={canopy.shade} opacity="0.5" />
-          <circle cx="56" cy="42" r="20" fill={canopy.light} opacity="0.85" />
+          {TIPS.map(([x, y], i) => (
+            <g key={i}>
+              <circle cx={x} cy={y} r="7" fill={c.light} />
+              <circle cx={x - 6} cy={y + 4} r="5.5" fill={c.base} />
+              <circle cx={x + 6} cy={y + 3} r="5.5" fill={c.base} />
+              {i % 2 === 0 && <circle cx={x + 2} cy={y - 5} r="2.5" fill={palette.blossom} />}
+              {i % 3 === 0 && <circle cx={x - 4} cy={y - 3} r="2" fill={palette.blossom} />}
+            </g>
+          ))}
         </g>
       )}
 
-      {treeKind === 'autumn' && (
+      {/* ☀️ SUMMER / 🍂 AUTUMN: full clustered canopy (3-tone, Image 1/4 style) */}
+      {(kind === 'full' || kind === 'autumn') && (
         <g>
-          <circle cx="70" cy="56" r="30" fill={canopy.base} opacity="0.95" />
-          <circle cx="50" cy="70" r="16" fill={canopy.shade} opacity="0.9" />
-          <circle cx="90" cy="64" r="14" fill="#facc15" opacity="0.9" />
-          <circle cx="80" cy="42" r="12" fill={canopy.light} opacity="0.9" />
-          <circle cx="58" cy="46" r="10" fill={canopy.shade} opacity="0.75" />
+          <ellipse cx="62" cy="92" rx="26" ry="21" fill={c.base} transform="rotate(-12 62 92)" />
+          <ellipse cx="138" cy="92" rx="26" ry="21" fill={c.base} transform="rotate(12 138 92)" />
+          <ellipse cx="80" cy="62" rx="27" ry="23" fill={c.base} transform="rotate(-8 80 62)" />
+          <ellipse cx="120" cy="62" rx="27" ry="23" fill={c.base} transform="rotate(8 120 62)" />
+          <ellipse cx="100" cy="44" rx="29" ry="23" fill={c.base} />
+          <ellipse cx="100" cy="78" rx="34" ry="20" fill={c.base} />
+          {/* shade layer (bottom) */}
+          <ellipse cx="76" cy="88" rx="18" ry="13" fill={c.shade} opacity="0.5" />
+          <ellipse cx="124" cy="88" rx="18" ry="13" fill={c.shade} opacity="0.5" />
+          <ellipse cx="100" cy="90" rx="22" ry="12" fill={c.shade} opacity="0.35" />
+          {/* light layer (top-left, sun side) */}
+          <ellipse cx="88" cy="40" rx="15" ry="11" fill={c.light} opacity="0.9" />
+          <ellipse cx="110" cy="32" rx="11" ry="8" fill={c.light} opacity="0.8" />
+          <ellipse cx="64" cy="72" rx="10" ry="8" fill={c.light} opacity="0.6" />
+          {/* branch tips peeking through (Image 3 trick) */}
+          <circle cx="40" cy="96" r="6" fill={c.shade} opacity="0.9" />
+          <circle cx="160" cy="96" r="6" fill={c.shade} opacity="0.9" />
         </g>
       )}
 
-      {/* blossom dots (spring) */}
-      {treeKind === 'blossom' && blossom && (
-        <g fill={blossom}>
-          <circle cx="52" cy="48" r="3.5" />
-          <circle cx="78" cy="40" r="3.5" />
-          <circle cx="64" cy="66" r="3.5" />
-          <circle cx="90" cy="62" r="3.5" />
-          <circle cx="42" cy="70" r="3.5" />
-          <circle cx="74" cy="82" r="3.5" />
-          <circle cx="98" cy="80" r="3.5" />
-        </g>
-      )}
-
-      {/* snow on branches + snow mound (winter) */}
-      {treeKind === 'bare' && (
+      {/* 🍂 autumn: a few leaves detaching near the canopy */}
+      {kind === 'autumn' && (
         <g>
-          <ellipse cx="40" cy="39" rx="7" ry="2.5" fill="#f8fafc" />
-          <ellipse cx="102" cy="37" rx="7" ry="2.5" fill="#f8fafc" />
-          <ellipse cx="70" cy="43" rx="6" ry="2.5" fill="#f8fafc" />
-          <ellipse cx="58" cy="43" rx="5" ry="2" fill="#f1f5f9" />
-          <ellipse cx="84" cy="49" rx="5" ry="2" fill="#f1f5f9" />
-          <ellipse cx="70" cy="184" rx="30" ry="7" fill="#ffffff" opacity="0.9" />
+          <ellipse cx="70" cy="128" rx="5" ry="3" fill={c.shade} transform="rotate(30 70 128)" />
+          <ellipse cx="134" cy="140" rx="5" ry="3" fill={c.light} transform="rotate(-25 134 140)" />
+          <ellipse cx="98" cy="158" rx="5" ry="3" fill={c.shade} transform="rotate(60 98 158)" />
+          <ellipse cx="118" cy="120" rx="4" ry="2.5" fill={c.light} transform="rotate(-40 118 120)" />
+        </g>
+      )}
+
+      {/* ❄️ WINTER: bare skeleton + snow resting on branch unions */}
+      {kind === 'bare' && (
+        <g fill="#f8fafc">
+          <ellipse cx="100" cy="149" rx="9" ry="3" />
+          <ellipse cx="62" cy="107" rx="7" ry="2.5" />
+          <ellipse cx="138" cy="107" rx="7" ry="2.5" />
+          <ellipse cx="82" cy="83" rx="6" ry="2" />
+          <ellipse cx="118" cy="83" rx="6" ry="2" />
+          <ellipse cx="100" cy="69" rx="6" ry="2" />
+          <ellipse cx="40" cy="95" rx="4" ry="1.5" />
+          <ellipse cx="160" cy="95" rx="4" ry="1.5" />
+          <ellipse cx="54" cy="83" rx="4" ry="1.5" />
+          <ellipse cx="146" cy="83" rx="4" ry="1.5" />
         </g>
       )}
     </svg>
@@ -252,7 +328,7 @@ export default function NatureBackdrop() {
           />
         ))}
 
-      {/* 💨 Wind moves ONLY leaves/particles/streaks — never the trees */}
+      {/* 💨 Wind moves ONLY particles/streaks — trees stay planted */}
       {windLines.map((w, i) => (
         <div
           key={`w-${i}`}
@@ -304,7 +380,7 @@ export default function NatureBackdrop() {
           </div>
         ))}
 
-      {/* 🌳 PLANTED trees — no float animation, sitting on the hills */}
+      {/* 🌳 PLANTED trees — layered depths, no floating */}
       <div className="absolute bottom-24 md:bottom-32 left-[12%] opacity-80">
         <Tree palette={palette} scale={0.55} />
       </div>
